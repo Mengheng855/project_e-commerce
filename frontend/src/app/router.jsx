@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AdminLayout } from '../layouts/AdminLayout'
 import { AuthLayout } from '../layouts/AuthLayout'
 import { StoreLayout } from '../layouts/StoreLayout'
@@ -56,10 +56,28 @@ const AdminOrderListPage = lazyNamed(() => import('../features/orders/pages/Orde
 const AdminOrderDetailPage = lazyNamed(() => import('../features/orders/pages/OrderDetailPage'), 'OrderDetailPage')
 
 function RouteLoading() {
-  return <PageSkeleton />
+  const { pathname } = useLocation()
+
+  if (pathname.startsWith('/admin')) {
+    if (pathname === '/admin/login') {
+      return <AuthPageSkeleton />
+    }
+
+    return <AdminPageSkeleton />
+  }
+
+  if (isAuthPath(pathname)) {
+    return <AuthPageSkeleton />
+  }
+
+  return <StorePageSkeleton />
 }
 
-function PageSkeleton() {
+function isAuthPath(pathname) {
+  return ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'].includes(pathname)
+}
+
+function StorePageSkeleton() {
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-teal-900/10">
@@ -132,11 +150,96 @@ function PageSkeleton() {
   )
 }
 
+function AuthPageSkeleton() {
+  return (
+    <main className="relative flex min-h-screen items-center justify-center bg-white p-5 text-teal-950">
+      <div className="absolute left-5 top-5 skeleton-shimmer h-10 w-32 rounded-md" />
+      <div className="w-full">
+        <div className="mb-6 flex justify-center">
+          <div className="flex items-center gap-3">
+            <div className="skeleton-shimmer h-12 w-12 rounded-md" />
+            <div className="skeleton-shimmer h-8 w-32 rounded" />
+          </div>
+        </div>
+        <div className="mx-auto w-full max-w-md rounded-lg border border-teal-900/15 bg-white p-6 shadow-sm">
+          <div className="skeleton-shimmer h-4 w-24 rounded" />
+          <div className="mt-4 skeleton-shimmer h-8 w-44 rounded" />
+          <div className="mt-3 skeleton-shimmer h-4 w-64 rounded" />
+          <div className="mt-8 grid gap-4">
+            <div className="skeleton-shimmer h-11 rounded-md" />
+            <div className="skeleton-shimmer h-11 rounded-md" />
+            <div className="skeleton-shimmer h-11 rounded-md" />
+          </div>
+          <div className="mt-6 skeleton-shimmer h-11 rounded-md" />
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function AdminPageSkeleton() {
+  return (
+    <div className="min-h-screen max-w-[100vw] overflow-hidden bg-slate-50 text-slate-950">
+      <aside className="fixed inset-y-0 hidden w-72 border-r border-slate-200 bg-white p-5 md:block">
+        <div className="flex items-center gap-3">
+          <div className="skeleton-shimmer h-11 w-11 rounded-lg" />
+          <div className="min-w-0 space-y-2">
+            <div className="skeleton-shimmer h-6 w-28 rounded" />
+            <div className="skeleton-shimmer h-4 w-36 rounded" />
+          </div>
+        </div>
+        <div className="mt-8 grid gap-3">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div className="skeleton-shimmer h-11 rounded-md" key={index} />
+          ))}
+        </div>
+      </aside>
+      <main className="md:ml-72">
+        <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="skeleton-shimmer h-4 w-36 rounded" />
+              <div className="skeleton-shimmer h-3 w-56 rounded" />
+            </div>
+            <div className="skeleton-shimmer h-12 w-32 rounded-md" />
+          </div>
+        </header>
+        <div className="grid gap-5 p-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="skeleton-shimmer h-4 w-28 rounded" />
+            <div className="mt-4 skeleton-shimmer h-9 w-52 rounded" />
+            <div className="mt-3 skeleton-shimmer h-4 w-96 max-w-full rounded" />
+          </section>
+          <section className="grid gap-4 md:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm" key={index}>
+                <div className="skeleton-shimmer h-4 w-24 rounded" />
+                <div className="mt-4 skeleton-shimmer h-8 w-16 rounded" />
+                <div className="mt-4 skeleton-shimmer h-4 w-32 rounded" />
+              </div>
+            ))}
+          </section>
+          <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-200 p-5">
+              <div className="skeleton-shimmer h-6 w-40 rounded" />
+            </div>
+            <div className="grid gap-3 p-5">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <div className="skeleton-shimmer h-12 rounded-md" key={index} />
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  )
+}
+
 function GuestRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return <PageSkeleton />
+    return <AuthPageSkeleton />
   }
 
   if (isAuthenticated) {
@@ -150,7 +253,7 @@ function AdminGuestRoute({ children }) {
   const { isAuthenticated, isLoading, user } = useAuth()
 
   if (isLoading) {
-    return <PageSkeleton />
+    return <AuthPageSkeleton />
   }
 
   if (isAuthenticated && user?.is_admin && storage.isAdminSession()) {
@@ -164,7 +267,7 @@ function AdminRoute({ children }) {
   const { isAuthenticated, isLoading, user } = useAuth()
 
   if (isLoading) {
-    return <PageSkeleton />
+    return <AdminPageSkeleton />
   }
 
   if (!isAuthenticated) {

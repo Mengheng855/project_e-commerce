@@ -13,14 +13,10 @@ services:
   frontend:
     build:
       context: ./frontend
-    environment:
-      VITE_DEV_BACKEND_ORIGIN: http://backend:8000
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host 0.0.0.0
+      - "80:80"
+    depends_on:
+      - backend
 
   database:
     image: mysql:8.0
