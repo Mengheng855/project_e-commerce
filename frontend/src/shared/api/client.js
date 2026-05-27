@@ -16,7 +16,19 @@ export async function apiClient(path, options = {}) {
   })
 
   const text = await response.text()
-  const data = text ? JSON.parse(text) : null
+  let data = null
+
+  if (text) {
+    try {
+      data = JSON.parse(text)
+    } catch {
+      const message = text.trim().startsWith('<')
+        ? 'API returned HTML instead of JSON. Check the frontend proxy or API URL.'
+        : 'API returned invalid JSON.'
+
+      throw new Error(message)
+    }
+  }
 
   if (!response.ok) {
     throw data ?? new Error('Request failed')
