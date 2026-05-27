@@ -4,6 +4,7 @@ import { getCategories } from '../../categories/api/categoryApi'
 import { getBanners } from '../api/bannerApi'
 import { sampleBanners } from '../data/sampleBanners'
 import { ProductCard } from '../components/ProductCard'
+import { assetUrl } from '../../../shared/utils/assetUrl'
 
 
 
@@ -127,7 +128,7 @@ export function StoreHomePage() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-teal-900/15 bg-white" id="top">
-        <img alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={activeBanner.image} />
+        <img alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={assetUrl(activeBanner.image)} />
         <div className="absolute inset-0 bg-white/35" />
         <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-16">
           <div>
@@ -150,7 +151,7 @@ export function StoreHomePage() {
             </div>
           </div>
           <div className="overflow-hidden">
-            <img alt="Store banner" className="h-64 w-full object-cover" src={activeBanner.foreground_image ?? activeBanner.image} />
+            <img alt="Store banner" className="h-64 w-full object-cover" src={assetUrl(activeBanner.foreground_image ?? activeBanner.image)} />
           </div>
         </div>
       </section>

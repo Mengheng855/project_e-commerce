@@ -7,6 +7,14 @@ function fileKey(file) {
   return [file.name, file.size, file.lastModified].join('-')
 }
 
+function createClientId() {
+  if (globalThis.crypto?.randomUUID) {
+    return globalThis.crypto.randomUUID()
+  }
+
+  return 'client-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2)
+}
+
 const variantPresets = [
   {
     label: 'RAM 2/4/8/16GB',
@@ -37,7 +45,7 @@ const variantPresets = [
 
 function createEmptyVariant() {
   return {
-    id: crypto.randomUUID(),
+    id: createClientId(),
     variant_type_id: '',
     variant_type_name: '',
     value: '',
@@ -50,7 +58,7 @@ function createEmptyVariant() {
 
 function createEmptySpecification() {
   return {
-    id: crypto.randomUUID(),
+    id: createClientId(),
     key: '',
     value: '',
   }
@@ -174,12 +182,12 @@ export function ProductForm({ brands = [], categories = [], initialValues = null
       is_featured: Boolean(initialValues.is_featured),
     })
     setSpecifications((initialValues.specifications ?? []).map((specification) => ({
-      id: String(specification.id ?? crypto.randomUUID()),
+      id: String(specification.id ?? createClientId()),
       key: specification.key ?? '',
       value: specification.value ?? '',
     })))
     setVariants((initialValues.variants ?? []).map((variant) => ({
-      id: String(variant.id ?? crypto.randomUUID()),
+      id: String(variant.id ?? createClientId()),
       variant_type_id: variant.variant_type_id ? String(variant.variant_type_id) : '',
       variant_type_name: variant.variant_type?.name ?? '',
       value: variant.value ?? '',

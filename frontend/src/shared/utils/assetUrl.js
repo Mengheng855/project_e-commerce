@@ -13,10 +13,10 @@ export function assetUrl(value) {
   if (/^https?:\/\//.test(value)) {
     try {
       const url = new URL(value)
-      const isLocalStorageUrl = ['localhost', '127.0.0.1'].includes(url.hostname) && url.pathname.startsWith('/storage/')
+      const isStorageUrl = url.pathname.startsWith('/storage/')
 
-      if (isLocalStorageUrl) {
-        return API_ORIGIN + url.pathname
+      if (isStorageUrl) {
+        return API_ORIGIN + url.pathname + url.search + url.hash
       }
     } catch {
       return value

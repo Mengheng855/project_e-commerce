@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { assetUrl } from '../../../shared/utils/assetUrl'
 import { getBanner } from '../api/bannerApi'
 
 export function BannerDetailPage() {
@@ -59,13 +60,13 @@ export function BannerDetailPage() {
       <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
         {banner.image && (
           <div className="md:col-span-2">
-            <img alt={banner.text ?? 'Banner'} className="h-64 w-full rounded-lg object-cover" src={banner.image} />
+            <img alt={banner.text ?? 'Banner'} className="h-64 w-full rounded-lg object-cover" src={assetUrl(banner.image)} />
           </div>
         )}
         {banner.foreground_image && (
           <div>
             <p className="text-xs font-black uppercase text-slate-500">Foreground</p>
-            <img alt="Foreground" className="mt-1 h-40 w-full rounded-lg object-cover" src={banner.foreground_image} />
+            <img alt="Foreground" className="mt-1 h-40 w-full rounded-lg object-cover" src={assetUrl(banner.foreground_image)} />
           </div>
         )}
         <div>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pagination } from '../../../shared/components/Pagination'
 import { ScrollableTable } from '../../../shared/components/ScrollableTable'
+import { assetUrl } from '../../../shared/utils/assetUrl'
 import { deleteBanner, getBanners } from '../api/bannerApi'
 
 const perPage = 10
@@ -174,7 +175,7 @@ export function BannerListPage() {
                     <td className="px-5 py-3 font-black text-slate-500">{(currentPage - 1) * perPage + index + 1}</td>
                     <td className="px-5 py-3">
                       {banner.image ? (
-                        <img alt={banner.text ?? 'Banner'} className="h-12 w-20 rounded-md object-cover" src={banner.image} />
+                        <img alt={banner.text ?? 'Banner'} className="h-12 w-20 rounded-md object-cover" src={assetUrl(banner.image)} />
                       ) : (
                         <div className="h-12 w-20 rounded-md bg-slate-200" />
                       )}
