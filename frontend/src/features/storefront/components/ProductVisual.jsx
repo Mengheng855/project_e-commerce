@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { assetUrl } from '../../../shared/utils/assetUrl'
-import { getProductHoverImage, getProductImage, getProductImages } from '../utils/productImages'
+import { getProductHoverImage, getProductImages } from '../utils/productImages'
 
 function visualImageKey(image) {
   return String(image?.id ?? image?.image ?? '')

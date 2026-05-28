@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getOrders } from '../../orders/api/orderApi'
+import { getProducts } from '../../products/api/productApi'
+import { getOrders, updateOrderStatus } from '../../orders/api/orderApi'
 import { useAuth } from '../../../shared/hooks/useAuth'
 import { formatCurrency } from '../../../shared/utils/formatCurrency'
+import { assetUrl } from '../../../shared/utils/assetUrl'
 
 const statusSteps = ['pending', 'paid', 'shipped', 'delivered']
 
@@ -51,19 +53,25 @@ function SkeletonOrders() {
 
 function OrderTimeline({ status }) {
   const isBadStatus = status === 'cancelled' || status === 'failed'
-  const currentIndex = statusSteps.indexOf(status)
+  const currentIndex = Math.max(statusSteps.indexOf(status), 0)
 
   if (isBadStatus) {
     return <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-black text-red-700">This order is {status}.</p>
   }
 
   return (
-    <div className="grid gap-2 sm:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-4">
       {statusSteps.map((step, index) => {
         const active = currentIndex >= index
+        const complete = currentIndex > index
         return (
-          <div className={(active ? 'border-teal-700 bg-teal-50 text-teal-900' : 'border-slate-200 bg-white text-slate-500') + ' rounded-md border px-3 py-2 text-xs font-black uppercase'} key={step}>
-            {step}
+          <div className="flex items-center gap-2" key={step}>
+            <span className={(active ? 'border-teal-800 bg-teal-800' : 'border-slate-300 bg-white') + ' flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2'}>
+              {complete ? <span className="h-1.5 w-1.5 rounded-full bg-white" /> : null}
+            </span>
+            <span className={(active ? 'text-teal-900' : 'text-slate-500') + ' text-xs font-black uppercase'}>
+              {step}
+            </span>
           </div>
         )
       })}
@@ -71,8 +79,33 @@ function OrderTimeline({ status }) {
   )
 }
 
-function OrderCard({ order }) {
+function OrderItemThumbnail({ item, product }) {
+  const [hasImageError, setHasImageError] = useState(false)
+  const image = assetUrl(item.product_image ?? product?.image)
+  const fallbackText = (item.product_name ?? product?.name ?? 'TT').slice(0, 2).toUpperCase()
+
+  if (!image || hasImageError) {
+    return (
+      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md border border-teal-900/10 bg-teal-900 text-sm font-black text-white">
+        {fallbackText}
+      </div>
+    )
+  }
+
+  return (
+    <img
+      alt={item.product_name ?? product?.name ?? 'Order item'}
+      className="h-20 w-20 shrink-0 rounded-md border border-teal-900/10 bg-slate-100 object-cover"
+      loading="lazy"
+      onError={() => setHasImageError(true)}
+      src={image}
+    />
+  )
+}
+
+function OrderCard({ cancelError, isCancelling, onCancel, order, productById }) {
   const items = order.items ?? order.order_items ?? []
+  const canCancel = order.status === 'pending'
 
   return (
     <article className="rounded-lg border border-teal-900/10 bg-white p-5 shadow-sm">
@@ -82,10 +115,26 @@ function OrderCard({ order }) {
           <h2 className="mt-1 text-xl font-black text-teal-950">{order.order_number}</h2>
           <p className="mt-1 text-sm font-semibold text-teal-900/65">Created {formatDate(order.created_at)}</p>
         </div>
-        <span className={statusTone(order.status) + ' w-fit rounded-full border px-3 py-1 text-sm font-black capitalize'}>
-          {order.status}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          {canCancel ? (
+            <button
+              className="rounded-md border border-red-200 px-3 py-2 text-sm font-black text-red-700 hover:border-red-700 hover:bg-red-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isCancelling}
+              onClick={() => onCancel(order)}
+              type="button"
+            >
+              {isCancelling ? 'Cancelling...' : 'Cancel order'}
+            </button>
+          ) : null}
+          <span className={statusTone(order.status) + ' w-fit rounded-full border px-3 py-1 text-sm font-black capitalize'}>
+            {order.status}
+          </span>
+        </div>
       </div>
+
+      {cancelError ? (
+        <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-bold text-red-700">{cancelError}</p>
+      ) : null}
 
       <div className="mt-4 grid gap-3 md:grid-cols-4">
         <div className="rounded-md border border-teal-900/10 p-3">
@@ -113,17 +162,35 @@ function OrderCard({ order }) {
       <div className="mt-4 divide-y divide-teal-900/10 rounded-md border border-teal-900/10">
         {items.length ? items.map((item) => {
           const selected = item.selected_options ?? []
+          const product = productById.get(item.product_id)
+          const productPath = product?.slug ? '/products/' + product.slug : null
+
           return (
-            <div className="grid gap-2 p-3 text-sm md:grid-cols-[1fr_auto]" key={item.id}>
-              <div>
-                <p className="font-black text-teal-950">{item.product_name}</p>
+            <div className="flex flex-col gap-3 p-3 text-sm sm:flex-row sm:items-center sm:justify-between" key={item.id}>
+              <div className="flex min-w-0 gap-3">
+                <OrderItemThumbnail item={item} product={product} />
+                <div className="min-w-0">
+                  {productPath ? (
+                    <Link className="font-black text-teal-950 hover:text-teal-700" to={productPath}>
+                      {item.product_name}
+                    </Link>
+                  ) : (
+                    <p className="font-black text-teal-950">{item.product_name}</p>
+                  )}
+                  {selected.length ? (
+                    <p className="mt-1 font-semibold text-teal-900/65">
+                      {selected.map((option) => `${option.type}: ${option.value}`).join(', ')}
+                    </p>
+                  ) : null}
+                  <p className="mt-2 text-xs font-black uppercase text-teal-700">Qty {item.qty}</p>
+                </div>
+              </div>
+              <div className="text-left sm:text-right">
+                <p className="font-black text-teal-950">{formatCurrency(Number(item.price) * Number(item.qty))}</p>
                 {selected.length ? (
-                  <p className="mt-1 font-semibold text-teal-900/65">
-                    {selected.map((option) => `${option.type}: ${option.value}`).join(', ')}
-                  </p>
+                  <p className="mt-1 text-xs font-bold text-teal-900/60">{item.qty} x {formatCurrency(item.price)}</p>
                 ) : null}
               </div>
-              <p className="font-black text-teal-950">{item.qty} x {formatCurrency(item.price)}</p>
             </div>
           )
         }) : (
@@ -140,6 +207,9 @@ export function CustomerOrdersPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [orders, setOrders] = useState([])
+  const [products, setProducts] = useState([])
+  const [cancelingOrderId, setCancelingOrderId] = useState(null)
+  const [cancelErrorByOrderId, setCancelErrorByOrderId] = useState({})
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -156,8 +226,14 @@ export function CustomerOrdersPage() {
       setError('')
 
       try {
-        const response = await getOrders()
-        if (active) setOrders(response?.data ?? [])
+        const [orderResponse, productResponse] = await Promise.all([
+          getOrders(),
+          getProducts({ per_page: 50 }),
+        ])
+        if (active) {
+          setOrders(orderResponse?.data ?? [])
+          setProducts(productResponse?.data ?? productResponse ?? [])
+        }
       } catch (error) {
         if (active) setError(error?.message ?? 'Could not load your orders.')
       } finally {
@@ -173,6 +249,27 @@ export function CustomerOrdersPage() {
   }, [isAuthenticated])
 
   const orderCount = useMemo(() => orders.length, [orders])
+  const productById = useMemo(() => new Map(products.map((product) => [product.id, product])), [products])
+
+  async function handleCancelOrder(order) {
+    if (!order?.id || order.status !== 'pending' || cancelingOrderId) return
+
+    const confirmed = window.confirm('Cancel this pending order?')
+    if (!confirmed) return
+
+    setCancelingOrderId(order.id)
+    setCancelErrorByOrderId((current) => ({ ...current, [order.id]: '' }))
+
+    try {
+      const updatedOrder = await updateOrderStatus(order.id, 'cancelled')
+      setOrders((current) => current.map((item) => (item.id === order.id ? { ...item, ...updatedOrder } : item)))
+    } catch (error) {
+      const message = error?.message ?? 'Could not cancel this order. Please contact the shop if it has already been accepted.'
+      setCancelErrorByOrderId((current) => ({ ...current, [order.id]: message }))
+    } finally {
+      setCancelingOrderId(null)
+    }
+  }
 
   return (
     <section className="bg-white py-12">
@@ -202,7 +299,16 @@ export function CustomerOrdersPage() {
           ) : null}
           {!isLoading && !error && orderCount ? (
             <div className="grid gap-4">
-              {orders.map((order) => <OrderCard key={order.id} order={order} />)}
+              {orders.map((order) => (
+                <OrderCard
+                  cancelError={cancelErrorByOrderId[order.id]}
+                  isCancelling={cancelingOrderId === order.id}
+                  key={order.id}
+                  onCancel={handleCancelOrder}
+                  order={order}
+                  productById={productById}
+                />
+              ))}
             </div>
           ) : null}
         </div>
