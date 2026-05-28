@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { getProducts } from '../../products/api/productApi'
 import { getCategories } from '../../categories/api/categoryApi'
 import { getBanners } from '../api/bannerApi'
-import { sampleBanners } from '../data/sampleBanners'
 import { ProductCard } from '../components/ProductCard'
 import { assetUrl } from '../../../shared/utils/assetUrl'
 
@@ -60,9 +59,44 @@ function ProductGridSkeleton({ count = 8 }) {
   )
 }
 
+function BannerPlaceholder({ compact = false }) {
+  return (
+    <div className={(compact ? 'h-64' : 'absolute inset-0 h-full w-full') + ' overflow-hidden bg-slate-100'}>
+      <div className="h-full w-full bg-[linear-gradient(135deg,#f8fafc_0%,#e2e8f0_45%,#ccfbf1_100%)]" />
+      <div className="absolute inset-0 opacity-70">
+        <div className="absolute left-[8%] top-[18%] h-24 w-40 rounded-md bg-white/70" />
+        <div className="absolute bottom-[16%] right-[12%] h-28 w-52 rounded-md bg-teal-900/10" />
+        <div className="absolute right-[28%] top-[28%] h-16 w-32 rounded-md bg-white/50" />
+      </div>
+    </div>
+  )
+}
+
+function BannerImage({ alt, className, compact = false, src }) {
+  const [hasImageError, setHasImageError] = useState(false)
+  const imageSrc = assetUrl(src)
+
+  useEffect(() => {
+    setHasImageError(false)
+  }, [imageSrc])
+
+  if (!imageSrc || hasImageError) {
+    return <BannerPlaceholder compact={compact} />
+  }
+
+  return (
+    <img
+      alt={alt}
+      className={className}
+      onError={() => setHasImageError(true)}
+      src={imageSrc}
+    />
+  )
+}
+
 export function StoreHomePage() {
   const [products, setProducts] = useState([])
-  const [banners, setBanners] = useState(sampleBanners)
+  const [banners, setBanners] = useState([])
   const [categories, setCategories] = useState([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [isLoading, setIsLoading] = useState(true)
@@ -77,17 +111,15 @@ export function StoreHomePage() {
           getBanners(),
           getCategories({ has_products: true, per_page: 50 }),
         ])
-        const nextBanners = apiBanners.length ? apiBanners : sampleBanners
-
         if (active) {
           setProducts(apiProducts)
-          setBanners(nextBanners)
+          setBanners(apiBanners)
           setCategories(apiCategories.filter((category) => category.is_active !== false))
         }
       } catch {
         if (active) {
           setProducts([])
-          setBanners(sampleBanners)
+          setBanners([])
           setCategories([])
         }
       } finally {
@@ -109,13 +141,13 @@ export function StoreHomePage() {
   }, [products])
 
   const featuredProduct = featuredProducts[0]
-  const activeBanner = banners[0] ?? sampleBanners[0]
+  const activeBanner = banners[0] ?? null
   const categoryOptions = useMemo(() => {
     const apiCategoryNames = categories.map((category) => category.name).filter(Boolean)
     const productCategoryNames = products.map((product) => product.category?.name).filter(Boolean)
     return [...new Set(apiCategoryNames.length ? apiCategoryNames : productCategoryNames)]
   }, [categories, products])
-  const heroTitle = activeBanner.title || formatHeroTitle(categoryOptions)
+  const heroTitle = activeBanner?.title || formatHeroTitle(categoryOptions)
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === 'All') {
@@ -128,7 +160,7 @@ export function StoreHomePage() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-teal-900/15 bg-white" id="top">
-        <img alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={assetUrl(activeBanner.image)} />
+        <BannerImage alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={activeBanner?.image} />
         <div className="absolute inset-0 bg-white/35" />
         <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-16">
           <div>
@@ -137,7 +169,7 @@ export function StoreHomePage() {
               {heroTitle}
             </h1>
             <p className="mt-5 max-w-2xl text-base font-bold leading-7 text-teal-950">
-              {activeBanner.text ?? 'Shop practical electronics with a focused catalog, clear prices, and dedicated product detail pages.'}
+              {activeBanner?.text ?? 'Shop practical electronics with a focused catalog, clear prices, and dedicated product detail pages.'}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a className="rounded-md bg-teal-800 px-5 py-3 text-sm font-black text-white hover:bg-teal-900" href="/products">
@@ -150,8 +182,8 @@ export function StoreHomePage() {
               ) : null}
             </div>
           </div>
-          <div className="overflow-hidden">
-            <img alt="Store banner" className="h-64 w-full object-cover" src={assetUrl(activeBanner.foreground_image ?? activeBanner.image)} />
+          <div className="relative overflow-hidden rounded-md border border-teal-900/10 bg-white/30">
+            <BannerImage alt="Store banner" className="h-64 w-full object-cover" compact src={activeBanner?.foreground_image ?? activeBanner?.image} />
           </div>
         </div>
       </section>
