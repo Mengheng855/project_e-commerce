@@ -49,6 +49,7 @@ export function Seo({
     document.documentElement.lang = 'en'
 
     setMeta('meta[name="description"]', { name: 'description', content: description })
+    setMeta('meta[name="keywords"]', { name: 'keywords', content: seoConfig.keywords })
     setMeta('meta[name="robots"]', { name: 'robots', content: robots })
     setMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: seoConfig.siteName })
     setMeta('meta[property="og:title"]', { property: 'og:title', content: fullTitle })

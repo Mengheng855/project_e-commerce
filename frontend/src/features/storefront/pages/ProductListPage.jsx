@@ -172,15 +172,16 @@ export function ProductListPage() {
     <>
       <Seo
         canonical="/products"
-        description="Browse TosTinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials."
+        description="Browse TosTinh and Tos Tinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials in Cambodia."
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
-          name: 'TosTinh products',
+          name: 'TosTinh / Tos Tinh products',
+          alternateName: ['Tos Tinh computer products', 'TosTinh electronics catalog'],
           url: seoConfig.siteUrl + '/products',
-          description: 'Browse TosTinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials.',
+          description: 'Browse TosTinh and Tos Tinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials in Cambodia.',
         }}
-        title="Shop Electronics"
+        title="Shop Tos Tinh Electronics"
       />
       <section className="border-b border-teal-900/15 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-10">

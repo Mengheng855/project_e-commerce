@@ -163,12 +163,13 @@ export function StoreHomePage() {
     <>
       <Seo
         canonical="/"
-        description="Shop computers, phones, accessories, and practical electronics from TosTinh."
+        description={seoConfig.defaultDescription}
         image="/logo.png"
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': 'Store',
           name: seoConfig.siteName,
+          alternateName: seoConfig.brandAliases.filter((name) => name !== seoConfig.siteName),
           url: seoConfig.siteUrl + '/',
           logo: seoConfig.siteUrl + '/logo.png',
           description: seoConfig.defaultDescription,
@@ -181,7 +182,7 @@ export function StoreHomePage() {
             })),
           },
         }}
-        title="Computers, Phones, and Electronics"
+        title="Tos Tinh Computers, Phones, and Electronics"
       />
       <section className="relative overflow-hidden border-b border-teal-900/15 bg-white" id="top">
         <BannerImage alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={activeBanner?.image} />
@@ -209,6 +210,15 @@ export function StoreHomePage() {
           <div className="relative overflow-hidden rounded-md border border-teal-900/10 bg-white/30">
             <BannerImage alt="Store banner" className="h-64 w-full object-cover" compact src={activeBanner?.foreground_image ?? activeBanner?.image} />
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-teal-900/10 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-8">
+          <h2 className="text-2xl font-black text-teal-950">TosTinh electronics store</h2>
+          <p className="mt-3 max-w-4xl text-sm font-semibold leading-6 text-teal-900/75">
+            TosTinh, also written as Tos Tinh, Tos, Tinh, តោះទិញ, តោះ ទិញ, តោះ, and ទិញ, helps shoppers find computers, phones, laptop accessories, keyboards, monitors, and daily tech essentials in Cambodia. Search for TosTinh store, Tos Tinh computer shop, Tos computer, Tinh phone shop, or តោះទិញ to find our latest electronics catalog.
+          </p>
         </div>
       </section>
 
