@@ -5,6 +5,7 @@ import { AuthLayout } from '../layouts/AuthLayout'
 import { StoreLayout } from '../layouts/StoreLayout'
 import { useAuth } from '../shared/hooks/useAuth'
 import { storage } from '../shared/utils/storage'
+import { Seo } from '../shared/seo/Seo'
 
 function lazyNamed(importer, exportName) {
   return lazy(() => importer().then((module) => ({ default: module[exportName] })))
@@ -13,6 +14,7 @@ function lazyNamed(importer, exportName) {
 const StoreHomePage = lazyNamed(() => import('../features/storefront/pages/StoreHomePage'), 'StoreHomePage')
 const ProductListPage = lazyNamed(() => import('../features/storefront/pages/ProductListPage'), 'ProductListPage')
 const ProductDetailPage = lazyNamed(() => import('../features/storefront/pages/ProductDetailPage'), 'ProductDetailPage')
+const NotFoundPage = lazyNamed(() => import('../features/storefront/pages/NotFoundPage'), 'NotFoundPage')
 const CartPage = lazyNamed(() => import('../features/cart/pages/CartPage'), 'CartPage')
 const BakongPaymentPage = lazyNamed(() => import('../features/cart/pages/BakongPaymentPage'), 'BakongPaymentPage')
 const CustomerOrdersPage = lazyNamed(() => import('../features/storefront/pages/CustomerOrdersPage'), 'CustomerOrdersPage')
@@ -235,6 +237,28 @@ function AdminPageSkeleton() {
   )
 }
 
+function RouteSeoDefaults() {
+  const { pathname } = useLocation()
+  const isPrivatePath = [
+    '/admin',
+    '/cart',
+    '/orders',
+    '/profile',
+    '/payments',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/verify-email',
+  ].some((path) => pathname === path || pathname.startsWith(path + '/'))
+
+  if (isPrivatePath) {
+    return <Seo canonical={pathname} robots="noindex, nofollow" title="Account" />
+  }
+
+  return null
+}
+
 function GuestRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth()
 
@@ -284,6 +308,7 @@ function AdminRoute({ children }) {
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <RouteSeoDefaults />
       <Suspense fallback={<RouteLoading />}>
         <Routes>
           <Route
@@ -692,6 +717,24 @@ export function AppRouter() {
                 <AdminHomePage />
               </AdminLayout>
             </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <AdminRoute>
+              <AdminLayout>
+                <NotFoundPage homePath="/admin" homeText="Back to dashboard" showProducts={false} />
+              </AdminLayout>
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <StoreLayout>
+              <NotFoundPage />
+            </StoreLayout>
           }
         />
         </Routes>

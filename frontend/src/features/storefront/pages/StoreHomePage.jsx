@@ -4,6 +4,8 @@ import { getCategories } from '../../categories/api/categoryApi'
 import { getBanners } from '../api/bannerApi'
 import { ProductCard } from '../components/ProductCard'
 import { assetUrl } from '../../../shared/utils/assetUrl'
+import { Seo } from '../../../shared/seo/Seo'
+import { seoConfig } from '../../../shared/seo/config'
 
 
 
@@ -159,6 +161,28 @@ export function StoreHomePage() {
 
   return (
     <>
+      <Seo
+        canonical="/"
+        description="Shop computers, phones, accessories, and practical electronics from TosTinh."
+        image="/logo.png"
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Store',
+          name: seoConfig.siteName,
+          url: seoConfig.siteUrl + '/',
+          logo: seoConfig.siteUrl + '/logo.png',
+          description: seoConfig.defaultDescription,
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'Electronics catalog',
+            itemListElement: categoryOptions.map((category) => ({
+              '@type': 'OfferCatalog',
+              name: category,
+            })),
+          },
+        }}
+        title="Computers, Phones, and Electronics"
+      />
       <section className="relative overflow-hidden border-b border-teal-900/15 bg-white" id="top">
         <BannerImage alt="Electronics banner" className="absolute inset-0 h-full w-full object-cover" src={activeBanner?.image} />
         <div className="absolute inset-0 bg-white/35" />

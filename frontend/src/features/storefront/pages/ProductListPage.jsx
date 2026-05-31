@@ -4,6 +4,8 @@ import { getBrands } from '../../brands/api/brandApi'
 import { getCategories } from '../../categories/api/categoryApi'
 import { getProducts } from '../../products/api/productApi'
 import { ProductCard } from '../components/ProductCard'
+import { Seo } from '../../../shared/seo/Seo'
+import { seoConfig } from '../../../shared/seo/config'
 
 const productsPerPage = 8
 
@@ -168,6 +170,18 @@ export function ProductListPage() {
 
   return (
     <>
+      <Seo
+        canonical="/products"
+        description="Browse TosTinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials."
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'TosTinh products',
+          url: seoConfig.siteUrl + '/products',
+          description: 'Browse TosTinh electronics including computers, phones, accessories, keyboards, monitors, and daily tech essentials.',
+        }}
+        title="Shop Electronics"
+      />
       <section className="border-b border-teal-900/15 bg-white">
         <div className="mx-auto max-w-7xl px-5 py-10">
           <p className="text-sm font-black uppercase tracking-wide text-teal-800">Shop catalog</p>
