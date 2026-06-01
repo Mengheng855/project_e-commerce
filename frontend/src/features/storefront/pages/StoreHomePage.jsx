@@ -213,15 +213,6 @@ export function StoreHomePage() {
         </div>
       </section>
 
-      <section className="border-b border-teal-900/10 bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-8">
-          <h2 className="text-2xl font-black text-teal-950">TosTinh electronics store</h2>
-          <p className="mt-3 max-w-4xl text-sm font-semibold leading-6 text-teal-900/75">
-            TosTinh, also written as Tos Tinh, Tos, Tinh, តោះទិញ, តោះ ទិញ, តោះ, and ទិញ, helps shoppers find computers, phones, laptop accessories, keyboards, monitors, and daily tech essentials in Cambodia. Search for TosTinh store, Tos Tinh computer shop, Tos computer, Tinh phone shop, or តោះទិញ to find our latest electronics catalog.
-          </p>
-        </div>
-      </section>
-
       <section className="mx-auto max-w-7xl px-5 py-10" id="products">
         <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
