@@ -42,6 +42,7 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
       - prometheus
+      - loki
 
   prometheus:
     image: prom/prometheus:latest
@@ -58,6 +59,38 @@ services:
     depends_on:
       - node-exporter
       - cadvisor
+      - mysqld-exporter
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    ports:
+      - "9104:9104"
+    command:
+      - --config.my-cnf=/cfg/.my.cnf
+    volumes:
+      - ./monitoring/mysqld-exporter.cnf:/cfg/.my.cnf:ro
+    depends_on:
+      - database
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command:
+      - -config.file=/etc/loki/loki.yml
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
+
+  promtail:
+    image: grafana/promtail:latest
+    command:
+      - -config.file=/etc/promtail/promtail.yml
+    volumes:
+      - ./monitoring/promtail.yml:/etc/promtail/promtail.yml:ro
+      - ./backend/storage/logs:/var/log/laravel:ro
+    depends_on:
+      - loki
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -83,4 +116,5 @@ services:
 volumes:
   database_data:
   grafana_data:
+  loki_data:
   prometheus_data:
