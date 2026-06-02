@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getCategories } from '../features/categories/api/categoryApi'
 import { getActiveLogo } from '../features/logos/api/logoApi'
+import { getCart } from '../features/cart/api/cartApi'
+import { CART_COUNT_EVENT, publishCartCount, readStoredCartCount } from '../features/cart/utils/cartCount'
 import { assetUrl } from '../shared/utils/assetUrl'
 import { useAuth } from '../shared/hooks/useAuth'
 
@@ -24,6 +26,7 @@ export function StoreLayout({ children }) {
   const avatar = user?.profile?.avatar
   const avatarInitial = (user?.first_name?.[0] ?? user?.username?.[0] ?? 'U').toUpperCase()
   const [logo, setLogo] = useState(null)
+  const [cartCount, setCartCount] = useState(() => readStoredCartCount())
   const [categories, setCategories] = useState([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const logoSrc = logo?.image ? assetUrl(logo.image) : '/logo.png'
@@ -43,6 +46,44 @@ export function StoreLayout({ children }) {
     })
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    function handleCartCount(event) {
+      setCartCount(Number(event.detail?.count ?? 0))
+    }
+
+    function handleStorage(event) {
+      if (event.key === 'cart_count') {
+        setCartCount(Number(event.newValue ?? 0))
+      }
+    }
+
+    window.addEventListener(CART_COUNT_EVENT, handleCartCount)
+    window.addEventListener('storage', handleStorage)
+
+    return () => {
+      window.removeEventListener(CART_COUNT_EVENT, handleCartCount)
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    if (!isAuthenticated) {
+      setCartCount(0)
+      publishCartCount(0)
+      return () => { active = false }
+    }
+
+    getCart().then((cart) => {
+      if (active) setCartCount(cart?.items_count ?? 0)
+    }).catch(() => {
+      if (active) setCartCount(readStoredCartCount())
+    })
+
+    return () => { active = false }
+  }, [isAuthenticated])
 
   useEffect(() => {
     let active = true
@@ -106,8 +147,13 @@ export function StoreLayout({ children }) {
             </button>
             {isAuthenticated ? (
               <>
-                <Link aria-label="Cart" className="hidden h-10 w-10 place-items-center rounded-md border border-teal-800 text-teal-900 hover:bg-teal-800 hover:text-white md:grid" onClick={() => setIsMenuOpen(false)} title="Cart" to="/cart">
+                <Link aria-label="Cart" className="relative hidden h-10 w-10 place-items-center rounded-md border border-teal-800 text-teal-900 hover:bg-teal-800 hover:text-white md:grid" onClick={() => setIsMenuOpen(false)} title="Cart" to="/cart">
                   <CartIcon />
+                  {cartCount > 0 ? (
+                    <span className="absolute -right-2 -top-2 grid min-h-5 min-w-5 place-items-center rounded-full bg-orange-500 px-1 text-[11px] font-black leading-none text-white ring-2 ring-white">
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  ) : null}
                 </Link>
                 <div className="group relative hidden md:block">
                   <button aria-label="Account menu" className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-teal-800 bg-teal-800 text-sm font-black uppercase text-white hover:bg-teal-900" type="button">
@@ -191,7 +237,14 @@ export function StoreLayout({ children }) {
           {isAuthenticated ? (
             <>
               <Link className="rounded-md px-3 py-3 text-base font-black text-teal-950 hover:bg-teal-50" onClick={() => setIsMenuOpen(false)} to="/cart">
-                Cart
+                <span className="inline-flex items-center gap-2">
+                  Cart
+                  {cartCount > 0 ? (
+                    <span className="grid min-h-5 min-w-5 place-items-center rounded-full bg-orange-500 px-1 text-[11px] font-black leading-none text-white">
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  ) : null}
+                </span>
               </Link>
               <Link className="rounded-md px-3 py-3 text-base font-black text-teal-950 hover:bg-teal-50" onClick={() => setIsMenuOpen(false)} to="/profile">
                 Profile

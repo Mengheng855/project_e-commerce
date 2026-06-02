@@ -14,7 +14,7 @@ class ProductService
 
     private const PRODUCT_RELATIONS = ['category:id,name,slug', 'brand:id,name,slug', 'images', 'specifications', 'variants.variantType:id,name', 'user:id,username', 'updatedBy:id,username'];
 
-    public function paginate(array $filters = []): LengthAwarePaginator
+    public function paginate(array $filters = [], bool $includeInactive = false): LengthAwarePaginator
     {
         $perPage = max(1, min((int) ($filters['per_page'] ?? 10), 50));
         $isFeatured = array_key_exists('is_featured', $filters) && $filters['is_featured'] !== ''
@@ -23,7 +23,7 @@ class ProductService
 
         return Product::query()
             ->with(self::LIST_RELATIONS)
-            ->where('is_active', true)
+            ->when(! $includeInactive, fn (Builder $query) => $query->where('is_active', true))
             ->when($filters['search'] ?? null, function (Builder $query, string $search) {
                 $query->where(function (Builder $query) use ($search) {
                     $query->where('name', 'like', "%{$search}%")

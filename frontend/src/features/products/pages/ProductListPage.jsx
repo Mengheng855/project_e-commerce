@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Pagination } from '../../../shared/components/Pagination'
 import { getCategories } from '../../categories/api/categoryApi'
-import { deleteProduct, getProducts } from '../api/productApi'
+import { deleteProduct, getAdminProducts } from '../api/productApi'
 import { ProductTable } from '../components/ProductTable'
 
 const perPage = 10
@@ -52,7 +52,7 @@ export function ProductListPage() {
     async function loadProducts() {
       try {
         const [productData, categoryData] = await Promise.all([
-          getProducts({ per_page: 50 }),
+          getAdminProducts({ per_page: 50 }),
           getCategories({ per_page: 50 }),
         ])
         if (active) {

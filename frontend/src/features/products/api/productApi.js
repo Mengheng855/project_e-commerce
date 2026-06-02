@@ -14,6 +14,19 @@ export async function getProduct(slug) {
   return response.data
 }
 
+export async function getAdminProducts(params = {}) {
+  const query = new URLSearchParams(params).toString()
+  const response = await apiClient(query ? endpoints.adminProducts + '?' + query : endpoints.adminProducts)
+
+  return response.data ?? []
+}
+
+export async function getAdminProduct(slug) {
+  const response = await apiClient(endpoints.adminProducts + '/' + slug)
+
+  return response.data
+}
+
 export async function getVariantTypes() {
   const response = await apiClient(endpoints.variantTypes)
 

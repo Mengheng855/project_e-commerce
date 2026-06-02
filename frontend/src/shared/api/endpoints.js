@@ -9,6 +9,7 @@ export const endpoints = {
     resetPassword: '/auth/reset-password',
   },
   products: '/products',
+  adminProducts: '/admin/products',
   productImages: '/product-images/upload',
   variantTypes: '/variant-types',
   categories: '/categories',

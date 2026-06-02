@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBrands } from '../../brands/api/brandApi'
 import { getCategories } from '../../categories/api/categoryApi'
-import { getProduct, getVariantTypes, updateProduct } from '../api/productApi'
+import { getAdminProduct, getVariantTypes, updateProduct } from '../api/productApi'
 import { ProductForm } from '../components/ProductForm'
 import { prepareProductPayload } from '../utils/productPayload'
 
@@ -23,7 +23,7 @@ export function ProductEditPage() {
     async function loadData() {
       try {
         const [productData, categoryData, brandData, variantTypeData] = await Promise.all([
-          getProduct(slug),
+          getAdminProduct(slug),
           getCategories({ per_page: 50 }),
           getBrands({ per_page: 50 }),
           getVariantTypes(),

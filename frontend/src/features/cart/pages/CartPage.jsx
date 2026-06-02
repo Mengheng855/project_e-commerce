@@ -12,6 +12,7 @@ function itemImage(item) {
 export function CartPage() {
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
+  const isBakongDisabled = true
   const [cart, setCart] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -81,6 +82,10 @@ export function CartPage() {
 
   async function handleCheckout() {
     if (!items.length || updatingId) return
+    if (paymentMethod === 'bakong' && isBakongDisabled) {
+      setError('KH Bakong payment is temporarily disabled. Please order by Telegram.')
+      return
+    }
 
     setError('')
     setSuccess('')
@@ -244,9 +249,9 @@ export function CartPage() {
                     </span>
                   </span>
                 </label>
-                <label className={(paymentMethod === 'bakong' ? 'border-teal-800 bg-teal-50 ' : 'border-teal-900/15 bg-white ') + 'cursor-pointer rounded-lg border p-3'}>
+                <label className={(paymentMethod === 'bakong' ? 'border-teal-800 bg-teal-50 ' : 'border-teal-900/15 bg-white ') + (isBakongDisabled ? 'cursor-not-allowed opacity-55 ' : 'cursor-pointer ') + 'rounded-lg border p-3'}>
                   <span className="flex items-start gap-3">
-                    <input checked={paymentMethod === 'bakong'} className="mt-1" onChange={() => setPaymentMethod('bakong')} type="radio" />
+                    <input checked={paymentMethod === 'bakong'} className="mt-1" disabled={isBakongDisabled} onChange={() => setPaymentMethod('bakong')} type="radio" />
                     <span>
                       <span className="block text-sm font-black text-teal-950">KH Bakong</span>
                       <span className="mt-1 block text-xs font-semibold leading-5 text-teal-900/70">Show KHQR code so you can scan and pay.</span>

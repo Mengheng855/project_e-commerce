@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getProduct, getProducts } from '../api/productApi'
+import { getAdminProduct, getAdminProducts } from '../api/productApi'
 import { assetUrl } from '../../../shared/utils/assetUrl'
 import { formatCurrency } from '../../../shared/utils/formatCurrency'
 import { ScrollableTable } from '../../../shared/components/ScrollableTable'
@@ -35,11 +35,11 @@ export function ProductDetailPage() {
       setIsLoading(true)
 
       try {
-        const data = await getProduct(slug)
+        const data = await getAdminProduct(slug)
         if (active) setProduct(data)
       } catch (error) {
         try {
-          const products = await getProducts({ search: slug, per_page: 50 })
+          const products = await getAdminProducts({ search: slug, per_page: 50 })
           const fallbackProduct = products.find((item) => item.slug === slug) ?? null
           if (active) {
             setProduct(fallbackProduct)
@@ -80,7 +80,12 @@ export function ProductDetailPage() {
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div>
             <p className="text-sm font-black uppercase tracking-wide text-teal-700">Product detail</p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">{product.name}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-black text-slate-950">{product.name}</h1>
+              <span className={(product.is_active ? 'bg-teal-50 text-teal-700 ' : 'bg-slate-100 text-slate-600 ') + 'rounded-md px-2 py-1 text-xs font-black'}>
+                {product.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link className="rounded-md border border-teal-800 px-4 py-2 text-sm font-bold text-teal-900 hover:bg-teal-800 hover:text-white" to="/admin/products">Back</Link>

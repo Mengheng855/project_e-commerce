@@ -30,6 +30,26 @@ class ProductController extends Controller
         return ProductListResource::collection($products);
     }
 
+    public function adminIndex(Request $request)
+    {
+        $products = $this->products->paginate($request->only([
+            'search',
+            'category_id',
+            'brand_id',
+            'is_featured',
+            'per_page',
+        ]), includeInactive: true);
+
+        return ProductListResource::collection($products);
+    }
+
+    public function adminShow(Request $request, Product $product)
+    {
+        $this->products->ensureCanView($product, $request->user());
+
+        return new ProductResource($this->products->loadForDetail($product));
+    }
+
     public function store(StoreProductRequest $request)
     {
         $product = $this->products->create($request->validated(), $request->user());
