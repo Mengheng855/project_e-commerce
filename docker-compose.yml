@@ -2,8 +2,11 @@ services:
   backend:
     build:
       context: ./backend
-    ports:
-      - "8000:8000"
+    environment:
+      DB_HOST: database
+      DB_DATABASE: ${MYSQL_DATABASE:-tostinh}
+      DB_USERNAME: ${MYSQL_USER:-tostinh}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
     volumes:
       - ./backend:/var/www/html
     depends_on:
@@ -21,12 +24,10 @@ services:
   database:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: tostinh
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: tostinh
-      MYSQL_PASSWORD: secret
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tostinh}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_USER: ${MYSQL_USER:-tostinh}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
     volumes:
       - database_data:/var/lib/mysql
 
@@ -46,8 +47,6 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -63,19 +62,26 @@ services:
 
   mysqld-exporter:
     image: prom/mysqld-exporter:latest
-    ports:
-      - "9104:9104"
-    command:
-      - --config.my-cnf=/cfg/.my.cnf
-    volumes:
-      - ./monitoring/mysqld-exporter.cnf:/cfg/.my.cnf:ro
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        cat > /tmp/.my.cnf <<EOF
+        [client]
+        user=$$MYSQL_USER
+        password=$$MYSQL_PASSWORD
+        host=database
+        port=3306
+        EOF
+        exec /bin/mysqld_exporter --config.my-cnf=/tmp/.my.cnf
+    environment:
+      MYSQL_USER: ${MYSQL_USER:-tostinh}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
     depends_on:
       - database
 
   loki:
     image: grafana/loki:latest
-    ports:
-      - "3100:3100"
     command:
       - -config.file=/etc/loki/loki.yml
     volumes:
@@ -94,8 +100,6 @@ services:
 
   node-exporter:
     image: prom/node-exporter:latest
-    ports:
-      - "9100:9100"
     command:
       - --path.rootfs=/host
     volumes:
@@ -103,8 +107,6 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    ports:
-      - "8080:8080"
     privileged: true
     volumes:
       - /:/rootfs:ro

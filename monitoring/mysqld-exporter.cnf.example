@@ -1,5 +1,5 @@
 [client]
 user=tostinh
-password=secret
+password=change-this-db-password
 host=database
 port=3306
