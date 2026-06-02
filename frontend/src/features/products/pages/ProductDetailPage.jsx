@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { getProduct, getProducts } from '../api/productApi'
 import { assetUrl } from '../../../shared/utils/assetUrl'
 import { formatCurrency } from '../../../shared/utils/formatCurrency'
+import { ScrollableTable } from '../../../shared/components/ScrollableTable'
 
 function formatDate(value) {
   return value ? new Date(value).toLocaleString() : '-'
@@ -75,7 +76,7 @@ export function ProductDetailPage() {
 
   return (
     <div className="grid gap-5">
-      <section className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
           <div>
             <p className="text-sm font-black uppercase tracking-wide text-teal-700">Product detail</p>
@@ -147,8 +148,9 @@ export function ProductDetailPage() {
         </div>
 
         {(product.variants ?? []).length ? (
-          <div className="mt-5 overflow-hidden rounded-lg border border-slate-200">
-            <table className="w-full min-w-[760px] text-left text-sm">
+          <div className="mt-5 max-w-full overflow-hidden rounded-lg border border-slate-200">
+            <ScrollableTable>
+            <table className="w-full min-w-[1120px] text-left text-sm">
               <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-3">No.</th>
@@ -185,6 +187,7 @@ export function ProductDetailPage() {
                 ))}
               </tbody>
             </table>
+            </ScrollableTable>
           </div>
         ) : (
           <p className="mt-5 rounded-md border border-dashed border-slate-300 px-4 py-5 text-sm font-semibold text-slate-500">No variants added for this product.</p>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { Input } from '../../../shared/components/Input'
+import { ScrollableTable } from '../../../shared/components/ScrollableTable'
 import { createVariantType, deleteVariantType, getVariantTypes, updateVariantType } from '../api/productApi'
 
 function EditIcon() {
@@ -121,7 +122,7 @@ export function VariantTypeListPage() {
           </div>
         </form>
 
-        <section className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="grid max-w-full gap-4 overflow-hidden rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <p className="text-sm font-black text-slate-950">All variant types</p>
@@ -130,32 +131,34 @@ export function VariantTypeListPage() {
             <input className="h-10 rounded-md border border-slate-300 px-3 text-sm font-semibold text-slate-950 outline-none placeholder:text-slate-400 focus:border-teal-800 focus:ring-2 focus:ring-teal-800/20" onChange={(event) => setSearch(event.target.value)} placeholder="Search type" type="search" value={search} />
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-slate-200">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
-                <tr>
-                  <th className="px-5 py-3">No.</th>
-                  <th className="px-5 py-3">Name</th>
-                  <th className="px-5 py-3">Variants</th>
-                  <th className="px-5 py-3">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {isLoading ? <tr><td className="px-5 py-8 text-center font-semibold text-slate-500" colSpan="4">Loading variant types...</td></tr> : filteredVariantTypes.length ? filteredVariantTypes.map((variantType, index) => (
-                  <tr key={variantType.id}>
-                    <td className="px-5 py-3 font-black text-slate-500">{index + 1}</td>
-                    <td className="px-5 py-3 font-black text-slate-950">{variantType.name}</td>
-                    <td className="px-5 py-3 font-semibold text-slate-700">{variantType.variants_count ?? 0}</td>
-                    <td className="px-5 py-3">
-                      <div className="flex gap-2">
-                        <button aria-label="Edit variant type" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 hover:border-slate-500 hover:bg-slate-50" onClick={() => startEdit(variantType)} title="Edit" type="button"><EditIcon /></button>
-                        <button aria-label="Delete variant type" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-red-600 hover:border-red-600 hover:bg-red-50 disabled:opacity-50" disabled={isSaving || (variantType.variants_count ?? 0) > 0} onClick={() => handleDelete(variantType)} title={(variantType.variants_count ?? 0) > 0 ? 'Used by products' : 'Delete'} type="button"><TrashIcon /></button>
-                      </div>
-                    </td>
+          <div className="max-w-full overflow-hidden rounded-lg border border-slate-200">
+            <ScrollableTable>
+              <table className="w-full min-w-[1120px] text-left text-sm">
+                <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="px-5 py-3">No.</th>
+                    <th className="px-5 py-3">Name</th>
+                    <th className="px-5 py-3">Variants</th>
+                    <th className="px-5 py-3">Action</th>
                   </tr>
-                )) : <tr><td className="px-5 py-8 text-center font-semibold text-slate-500" colSpan="4">No variant types found.</td></tr>}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {isLoading ? <tr><td className="px-5 py-8 text-center font-semibold text-slate-500" colSpan="4">Loading variant types...</td></tr> : filteredVariantTypes.length ? filteredVariantTypes.map((variantType, index) => (
+                    <tr key={variantType.id}>
+                      <td className="px-5 py-3 font-black text-slate-500">{index + 1}</td>
+                      <td className="px-5 py-3 font-black text-slate-950">{variantType.name}</td>
+                      <td className="px-5 py-3 font-semibold text-slate-700">{variantType.variants_count ?? 0}</td>
+                      <td className="px-5 py-3">
+                        <div className="flex gap-2">
+                          <button aria-label="Edit variant type" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-700 hover:border-slate-500 hover:bg-slate-50" onClick={() => startEdit(variantType)} title="Edit" type="button"><EditIcon /></button>
+                          <button aria-label="Delete variant type" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-red-600 hover:border-red-600 hover:bg-red-50 disabled:opacity-50" disabled={isSaving || (variantType.variants_count ?? 0) > 0} onClick={() => handleDelete(variantType)} title={(variantType.variants_count ?? 0) > 0 ? 'Used by products' : 'Delete'} type="button"><TrashIcon /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  )) : <tr><td className="px-5 py-8 text-center font-semibold text-slate-500" colSpan="4">No variant types found.</td></tr>}
+                </tbody>
+              </table>
+            </ScrollableTable>
           </div>
         </section>
       </section>

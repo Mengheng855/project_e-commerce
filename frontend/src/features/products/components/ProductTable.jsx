@@ -108,7 +108,7 @@ export function ProductTable({ isDeleting = false, isLoading = false, onDelete, 
   const allVisibleSelected = products.length > 0 && products.every((product) => selectedSet.has(product.id))
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+    <section className="max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
       <ScrollableTable>
         <table className="w-full min-w-[1460px] text-left text-sm">
           <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">

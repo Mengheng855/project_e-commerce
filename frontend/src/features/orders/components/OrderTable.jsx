@@ -230,7 +230,7 @@ export function OrderTable() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+      <section className="max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <ScrollableTable>
           <table className="w-full min-w-[1080px] text-left text-sm">
             <thead className="bg-amber-50/70 text-xs font-black uppercase tracking-wide text-slate-500">

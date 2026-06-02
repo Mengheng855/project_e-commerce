@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { assetUrl } from '../../../shared/utils/assetUrl'
 import { Input } from '../../../shared/components/Input'
+import { ScrollableTable } from '../../../shared/components/ScrollableTable'
 
 function fileKey(file) {
   return [file.name, file.size, file.lastModified].join('-')
@@ -487,31 +488,33 @@ export function ProductForm({ brands = [], categories = [], initialValues = null
         {specifications.length === 0 ? <p className="rounded-md border border-dashed border-slate-300 bg-white px-4 py-5 text-sm font-semibold text-slate-500">No specifications yet. Add fixed product info here; keep customer choices in variants.</p> : null}
 
         {specifications.length ? (
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
-                <tr>
-                  <th className="px-4 py-3">Spec</th>
-                  <th className="px-4 py-3">Value</th>
-                  <th className="px-4 py-3">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {specifications.map((specification) => (
-                  <tr key={specification.id}>
-                    <td className="px-4 py-3 align-top">
-                      <Input maxLength="100" onChange={(event) => handleSpecificationChange(specification.id, 'key', event.target.value)} placeholder="CPU" value={specification.key} />
-                    </td>
-                    <td className="px-4 py-3 align-top">
-                      <Input onChange={(event) => handleSpecificationChange(specification.id, 'value', event.target.value)} placeholder="A19 Pro, 8GB, 6.9 inch" value={specification.value} />
-                    </td>
-                    <td className="px-4 py-3 align-top">
-                      <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50" onClick={() => setSpecifications((currentSpecifications) => currentSpecifications.filter((currentSpecification) => currentSpecification.id !== specification.id))} type="button">Remove</button>
-                    </td>
+          <div className="max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <ScrollableTable>
+              <table className="w-full min-w-[1120px] text-left text-sm">
+                <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th className="px-4 py-3">Spec</th>
+                    <th className="px-4 py-3">Value</th>
+                    <th className="px-4 py-3">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {specifications.map((specification) => (
+                    <tr key={specification.id}>
+                      <td className="px-4 py-3 align-top">
+                        <Input maxLength="100" onChange={(event) => handleSpecificationChange(specification.id, 'key', event.target.value)} placeholder="CPU" value={specification.key} />
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <Input onChange={(event) => handleSpecificationChange(specification.id, 'value', event.target.value)} placeholder="A19 Pro, 8GB, 6.9 inch" value={specification.value} />
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50" onClick={() => setSpecifications((currentSpecifications) => currentSpecifications.filter((currentSpecification) => currentSpecification.id !== specification.id))} type="button">Remove</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </ScrollableTable>
           </div>
         ) : null}
       </section>
@@ -576,45 +579,47 @@ export function ProductForm({ brands = [], categories = [], initialValues = null
                 </label>
               </div>
 
-              <div className="overflow-hidden rounded-lg border border-slate-200">
-                <table className="w-full min-w-[760px] text-left text-sm">
-                  <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
-                    <tr>
-                      <th className="px-4 py-3">Value</th>
-                      {isColorGroup ? <th className="px-4 py-3">Color</th> : null}
-                      <th className="px-4 py-3">Price modifier</th>
-                      <th className="px-4 py-3">Stock</th>
-                      <th className="px-4 py-3">Active</th>
-                      <th className="px-4 py-3">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {group.items.map((variant) => (
-                      <tr key={variant.id}>
-                        <td className="px-4 py-3">
-                          <Input maxLength="100" onChange={(event) => handleVariantChange(variant.id, 'value', event.target.value)} placeholder="2GB, 16GB, Orange" required value={variant.value} />
-                        </td>
-                        {isColorGroup ? (
-                          <td className="px-4 py-3">
-                            <Input maxLength="7" onChange={(event) => handleVariantChange(variant.id, 'color_hex', event.target.value)} placeholder="#000000" value={variant.color_hex} />
-                          </td>
-                        ) : null}
-                        <td className="px-4 py-3">
-                          <Input onChange={(event) => handleVariantChange(variant.id, 'price_modifier', event.target.value)} step="0.01" type="number" value={variant.price_modifier} />
-                        </td>
-                        <td className="px-4 py-3">
-                          <Input min="0" onChange={(event) => handleVariantChange(variant.id, 'stock', event.target.value)} type="number" value={variant.stock} />
-                        </td>
-                        <td className="px-4 py-3">
-                          <input checked={variant.is_active} onChange={(event) => handleVariantChange(variant.id, 'is_active', event.target.checked)} type="checkbox" />
-                        </td>
-                        <td className="px-4 py-3">
-                          <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50" onClick={() => setVariants((currentVariants) => currentVariants.filter((currentVariant) => currentVariant.id !== variant.id))} type="button">Remove</button>
-                        </td>
+              <div className="max-w-full overflow-hidden rounded-lg border border-slate-200">
+                <ScrollableTable>
+                  <table className="w-full min-w-[1120px] text-left text-sm">
+                    <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
+                      <tr>
+                        <th className="px-4 py-3">Value</th>
+                        {isColorGroup ? <th className="px-4 py-3">Color</th> : null}
+                        <th className="px-4 py-3">Price modifier</th>
+                        <th className="px-4 py-3">Stock</th>
+                        <th className="px-4 py-3">Active</th>
+                        <th className="px-4 py-3">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {group.items.map((variant) => (
+                        <tr key={variant.id}>
+                          <td className="px-4 py-3">
+                            <Input maxLength="100" onChange={(event) => handleVariantChange(variant.id, 'value', event.target.value)} placeholder="2GB, 16GB, Orange" required value={variant.value} />
+                          </td>
+                          {isColorGroup ? (
+                            <td className="px-4 py-3">
+                              <Input maxLength="7" onChange={(event) => handleVariantChange(variant.id, 'color_hex', event.target.value)} placeholder="#000000" value={variant.color_hex} />
+                            </td>
+                          ) : null}
+                          <td className="px-4 py-3">
+                            <Input onChange={(event) => handleVariantChange(variant.id, 'price_modifier', event.target.value)} step="0.01" type="number" value={variant.price_modifier} />
+                          </td>
+                          <td className="px-4 py-3">
+                            <Input min="0" onChange={(event) => handleVariantChange(variant.id, 'stock', event.target.value)} type="number" value={variant.stock} />
+                          </td>
+                          <td className="px-4 py-3">
+                            <input checked={variant.is_active} onChange={(event) => handleVariantChange(variant.id, 'is_active', event.target.checked)} type="checkbox" />
+                          </td>
+                          <td className="px-4 py-3">
+                            <button className="rounded-md border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50" onClick={() => setVariants((currentVariants) => currentVariants.filter((currentVariant) => currentVariant.id !== variant.id))} type="button">Remove</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </ScrollableTable>
               </div>
             </div>
           )

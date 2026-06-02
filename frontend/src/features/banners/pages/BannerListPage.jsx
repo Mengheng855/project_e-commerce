@@ -129,7 +129,7 @@ export function BannerListPage() {
         </button>
       </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
+      <section className="max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <ScrollableTable>
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-500">
