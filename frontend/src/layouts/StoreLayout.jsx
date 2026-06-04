@@ -21,6 +21,16 @@ function CartIcon() {
   )
 }
 
+function InstallIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  )
+}
+
 export function StoreLayout({ children }) {
   const { isAuthenticated, logout, user } = useAuth()
   const avatar = user?.profile?.avatar
@@ -28,6 +38,8 @@ export function StoreLayout({ children }) {
   const [logo, setLogo] = useState(null)
   const [cartCount, setCartCount] = useState(() => readStoredCartCount())
   const [categories, setCategories] = useState([])
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const [isInstalled, setIsInstalled] = useState(() => window.matchMedia?.('(display-mode: standalone)').matches ?? false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const logoSrc = logo?.image ? assetUrl(logo.image) : '/logo.png'
 
@@ -46,6 +58,39 @@ export function StoreLayout({ children }) {
     })
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    function handleBeforeInstallPrompt(event) {
+      event.preventDefault()
+      setInstallPrompt(event)
+    }
+
+    function handleAppInstalled() {
+      setInstallPrompt(null)
+      setIsInstalled(true)
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    window.addEventListener('appinstalled', handleAppInstalled)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', handleAppInstalled)
+    }
+  }, [])
+
+  async function handleInstallApp() {
+    if (!installPrompt) return
+
+    installPrompt.prompt()
+    const choice = await installPrompt.userChoice
+
+    if (choice.outcome === 'accepted') {
+      setIsInstalled(true)
+    }
+
+    setInstallPrompt(null)
+  }
 
   useEffect(() => {
     function handleCartCount(event) {
@@ -134,6 +179,16 @@ export function StoreLayout({ children }) {
             </div>
           </nav>
           <div className="flex items-center gap-2">
+            {installPrompt && !isInstalled ? (
+              <button
+                className="hidden h-10 items-center gap-2 rounded-md border border-teal-800 px-3 text-sm font-black text-teal-900 hover:bg-teal-800 hover:text-white md:inline-flex"
+                onClick={handleInstallApp}
+                type="button"
+              >
+                <InstallIcon />
+                Install app
+              </button>
+            ) : null}
             <button
               aria-label="Toggle menu"
               aria-expanded={isMenuOpen}
@@ -236,6 +291,12 @@ export function StoreLayout({ children }) {
           </details>
           {isAuthenticated ? (
             <>
+              {installPrompt && !isInstalled ? (
+                <button className="mb-2 inline-flex items-center gap-2 rounded-md border border-teal-800 px-3 py-3 text-left text-base font-black text-teal-950 hover:bg-teal-50" onClick={() => { setIsMenuOpen(false); handleInstallApp() }} type="button">
+                  <InstallIcon />
+                  Install app
+                </button>
+              ) : null}
               <Link className="rounded-md px-3 py-3 text-base font-black text-teal-950 hover:bg-teal-50" onClick={() => setIsMenuOpen(false)} to="/cart">
                 <span className="inline-flex items-center gap-2">
                   Cart
@@ -258,6 +319,11 @@ export function StoreLayout({ children }) {
             </>
           ) : (
             <div className="mt-3 grid gap-2 border-t border-teal-900/10 pt-4">
+              {installPrompt && !isInstalled ? (
+                <button className="rounded-md border border-teal-800 px-4 py-3 text-center text-sm font-black text-teal-900" onClick={() => { setIsMenuOpen(false); handleInstallApp() }} type="button">
+                  Install app
+                </button>
+              ) : null}
               <Link className="rounded-md border border-teal-800 px-4 py-3 text-center text-sm font-black text-teal-900" onClick={() => setIsMenuOpen(false)} to="/login">
                 Login
               </Link>

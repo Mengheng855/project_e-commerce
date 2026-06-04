@@ -9,6 +9,8 @@ class LogoResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $isAdmin = (bool) $request->user()?->is_admin;
+
         return [
             'id' => $this->id,
             'image' => $this->image,
@@ -17,8 +19,7 @@ class LogoResource extends JsonResource
             'created_by' => $this->whenLoaded('user', fn () => $this->user ? [
                 'id' => $this->user->id,
                 'username' => $this->user->username,
-                'email' => $this->user->email,
-            ] : null),
+            ] + ($isAdmin ? ['email' => $this->user->email] : []) : null),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

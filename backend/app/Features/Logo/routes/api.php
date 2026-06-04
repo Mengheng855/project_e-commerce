@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('logo', [LogoController::class, 'active']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('admin/logos', [LogoController::class, 'index']);
     Route::post('admin/logos/upload', [LogoController::class, 'upload']);
     Route::post('admin/logos', [LogoController::class, 'store']);

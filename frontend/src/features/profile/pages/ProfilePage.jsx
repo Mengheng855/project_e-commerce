@@ -5,6 +5,25 @@ import { Input } from '../../../shared/components/Input'
 import { useAuth } from '../../../shared/hooks/useAuth'
 import { assetUrl } from '../../../shared/utils/assetUrl'
 
+function safeReturnPath(value) {
+  const fallback = '/profile'
+  const allowedPaths = new Set(['/cart', '/orders', '/profile'])
+
+  if (!value) return '/cart'
+
+  try {
+    const parsed = new URL(value, window.location.origin)
+
+    if (parsed.origin !== window.location.origin || !allowedPaths.has(parsed.pathname)) {
+      return fallback
+    }
+
+    return parsed.pathname + parsed.search + parsed.hash
+  } catch {
+    return fallback
+  }
+}
+
 export function ProfilePage() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -25,7 +44,7 @@ export function ProfilePage() {
     username: '',
   })
 
-  const returnTo = new URLSearchParams(location.search).get('return_to') || '/cart'
+  const returnTo = safeReturnPath(new URLSearchParams(location.search).get('return_to'))
   const needsPhone = new URLSearchParams(location.search).get('need_phone') === '1'
   const avatarPreview = useMemo(() => (avatarFile ? URL.createObjectURL(avatarFile) : null), [avatarFile])
   const currentAvatar = avatarPreview || assetUrl(values.avatar)
@@ -95,7 +114,7 @@ export function ProfilePage() {
       })
       setSuccess('Profile updated.')
       window.setTimeout(() => {
-        window.location.href = returnTo
+        navigate(returnTo, { replace: true })
       }, 400)
     } catch (error) {
       const firstFieldError = error?.errors ? Object.values(error.errors).flat()[0] : null

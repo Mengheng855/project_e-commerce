@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('banners', [BannerController::class, 'index'])->name('banners.index');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('admin/banners', [BannerController::class, 'all'])->name('admin.banners.all');
     Route::post('admin/banners/upload', [BannerController::class, 'upload'])->name('admin.banners.upload');
     Route::get('admin/banners/{banner}', [BannerController::class, 'show'])->name('admin.banners.show');

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 Route::get('variant-types', [VariantTypeController::class, 'index']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('admin/products', [ProductController::class, 'adminIndex']);
     Route::get('admin/products/{product}', [ProductController::class, 'adminShow']);
     Route::post('product-images/upload', ProductImageUploadController::class);

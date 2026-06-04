@@ -5,6 +5,7 @@ namespace App\Features\Auth\Services;
 use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -62,7 +63,9 @@ class AuthService
         $user = User::where('email', $data['email'])->firstOrFail();
 
         if ($user->email_verified_at) {
-            return $this->tokenResponse($user, $data['device_name'] ?? null, $request, $data);
+            throw ValidationException::withMessages([
+                'email' => ['This email is already verified. Please log in normally.'],
+            ]);
         }
 
         $otp = EmailOtp::where('user_id', $user->id)
@@ -78,8 +81,10 @@ class AuthService
             ]);
         }
 
-        $user->forceFill(['email_verified_at' => now()])->save();
-        $otp->update(['is_used' => true]);
+        DB::transaction(function () use ($user, $otp): void {
+            $user->forceFill(['email_verified_at' => now()])->save();
+            $otp->update(['is_used' => true]);
+        });
 
         return $this->tokenResponse($user->refresh()->load('profile'), $data['device_name'] ?? null, $request, $data);
     }
@@ -166,8 +171,8 @@ class AuthService
             'device_name' => $deviceName ?: trim($device['browser'].' on '.$device['platform']),
             'browser' => $device['browser'],
             'platform' => $device['platform'],
-            'ip_address' => $request->ip(),
-            'country' => $data['country'] ?? null,
+            'ip_address' => $this->clientIp($request),
+            'country' => $data['country'] ?? $this->countryFromRequest($request),
             'city' => $data['city'] ?? null,
             'latitude' => $data['latitude'] ?? null,
             'longitude' => $data['longitude'] ?? null,
@@ -206,5 +211,53 @@ class AuthService
         }
 
         return ['browser' => $browser, 'platform' => $platform];
+    }
+
+    private function clientIp(Request $request): ?string
+    {
+        $cloudflareIp = $this->validIp($request->headers->get('CF-Connecting-IP'));
+        if ($cloudflareIp) {
+            return $cloudflareIp;
+        }
+
+        foreach (explode(',', (string) $request->headers->get('X-Forwarded-For')) as $ip) {
+            $forwardedIp = $this->validIp($ip);
+            if ($forwardedIp) {
+                return $forwardedIp;
+            }
+        }
+
+        return $request->ip();
+    }
+
+    private function validIp(?string $ip): ?string
+    {
+        $ip = trim((string) $ip);
+
+        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : null;
+    }
+
+    private function countryFromRequest(Request $request): ?string
+    {
+        $countryCode = strtoupper(trim((string) $request->headers->get('CF-IPCountry')));
+
+        if ($countryCode === '' || $countryCode === 'XX') {
+            return null;
+        }
+
+        return [
+            'KH' => 'Cambodia',
+            'US' => 'United States',
+            'TH' => 'Thailand',
+            'VN' => 'Vietnam',
+            'CN' => 'China',
+            'JP' => 'Japan',
+            'KR' => 'South Korea',
+            'SG' => 'Singapore',
+            'MY' => 'Malaysia',
+            'ID' => 'Indonesia',
+            'PH' => 'Philippines',
+            'LA' => 'Laos',
+        ][$countryCode] ?? $countryCode;
     }
 }

@@ -9,6 +9,8 @@ class BrandResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $isAdmin = (bool) $request->user()?->is_admin;
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -21,13 +23,11 @@ class BrandResource extends JsonResource
             'created_by' => $this->whenLoaded('user', fn () => $this->user ? [
                 'id' => $this->user->id,
                 'username' => $this->user->username,
-                'email' => $this->user->email,
-            ] : null),
+            ] + ($isAdmin ? ['email' => $this->user->email] : []) : null),
             'updated_by' => $this->whenLoaded('updatedBy', fn () => $this->updatedBy ? [
                 'id' => $this->updatedBy->id,
                 'username' => $this->updatedBy->username,
-                'email' => $this->updatedBy->email,
-            ] : null),
+            ] + ($isAdmin ? ['email' => $this->updatedBy->email] : []) : null),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -3,7 +3,9 @@
   "short_name": "TosTinh",
   "description": "Shop computers, phones, accessories, and practical electronics from TosTinh.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#006c67",
   "icons": [
