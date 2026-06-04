@@ -2,3 +2,5 @@
 .env.*
 !.env.example
 monitoring/mysqld-exporter.cnf
+certs/*
+!certs/.gitignore
