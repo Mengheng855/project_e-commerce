@@ -2,6 +2,7 @@
 
 namespace App\Features\Logo\Resources;
 
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -13,7 +14,7 @@ class LogoResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'image' => $this->image,
+            'image' => PublicUrl::normalize($this->image),
             'title' => $this->title,
             'is_active' => $this->is_active,
             'created_by' => $this->whenLoaded('user', fn () => $this->user ? [

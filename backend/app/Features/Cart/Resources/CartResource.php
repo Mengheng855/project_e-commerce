@@ -2,6 +2,7 @@
 
 namespace App\Features\Cart\Resources;
 
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,7 +20,7 @@ class CartResource extends JsonResource
                     'id' => $item->product->id,
                     'name' => $item->product->name,
                     'slug' => $item->product->slug,
-                    'image' => $item->product->image,
+                    'image' => PublicUrl::normalize($item->product->image),
                     'price' => $item->product->price,
                     'stock' => $item->product->stock,
                 ] : null,

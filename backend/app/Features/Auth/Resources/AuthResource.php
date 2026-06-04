@@ -2,6 +2,7 @@
 
 namespace App\Features\Auth\Resources;
 
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,7 +26,7 @@ class AuthResource extends JsonResource
                 'profile' => $user->relationLoaded('profile') && $user->profile ? [
                     'phone_number' => $user->profile->phone_number,
                     'address' => $user->profile->address,
-                    'avatar' => $user->profile->avatar,
+                    'avatar' => PublicUrl::normalize($user->profile->avatar),
                     'gender' => $user->profile->gender,
                     'dob' => $user->profile->dob?->toDateString(),
                 ] : null,

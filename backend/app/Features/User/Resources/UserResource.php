@@ -2,6 +2,7 @@
 
 namespace App\Features\User\Resources;
 
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class UserResource extends JsonResource
             'profile' => $this->whenLoaded('profile', fn () => $this->profile ? [
                 'phone_number' => $this->profile->phone_number,
                 'address' => $this->profile->address,
-                'avatar' => $this->profile->avatar,
+                'avatar' => PublicUrl::normalize($this->profile->avatar),
                 'gender' => $this->profile->gender,
                 'dob' => $this->profile->dob?->toDateString(),
             ] : null),

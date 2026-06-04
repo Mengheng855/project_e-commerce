@@ -2,6 +2,7 @@
 
 namespace App\Features\Product\Resources;
 
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class ProductListResource extends JsonResource
             'price' => $this->price,
             'original_price' => $this->original_price,
             'stock' => $this->stock,
-            'image' => $this->image,
+            'image' => PublicUrl::normalize($this->image),
             'is_active' => $this->is_active,
             'is_featured' => $this->is_featured,
             'category' => $this->whenLoaded('category', fn () => [
