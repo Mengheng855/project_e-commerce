@@ -7,6 +7,7 @@ services:
       DB_DATABASE: ${MYSQL_DATABASE:-tostinh}
       DB_USERNAME: ${MYSQL_USER:-tostinh}
       DB_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      PHP_CLI_SERVER_WORKERS: 4
     volumes:
       - ./backend:/var/www/html
     depends_on:
