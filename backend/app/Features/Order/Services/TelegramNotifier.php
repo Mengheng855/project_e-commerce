@@ -56,10 +56,18 @@ class TelegramNotifier
             . "Items:\n{$itemLines}";
 
         try {
-            Http::timeout(10)->post("https://api.telegram.org/bot{$token}/sendMessage", [
+            $response = Http::timeout(10)->post("https://api.telegram.org/bot{$token}/sendMessage", [
                 'chat_id' => $chatId,
                 'text' => $message,
             ]);
+
+            if ($response->failed()) {
+                Log::warning('Telegram order notification failed.', [
+                    'order_id' => $order->id,
+                    'status' => $response->status(),
+                    'response' => $response->json() ?? $response->body(),
+                ]);
+            }
         } catch (Throwable $exception) {
             Log::warning('Telegram order notification failed.', [
                 'order_id' => $order->id,
