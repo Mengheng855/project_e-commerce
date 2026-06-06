@@ -13,6 +13,7 @@ use Illuminate\Validation\ValidationException;
 class AuthService
 {
     private const OTP_MAX_ATTEMPTS = 5;
+    private const OTP_RESEND_COOLDOWN_SECONDS = 60;
 
     public function register(array $data): User
     {
@@ -115,6 +116,17 @@ class AuthService
 
         if ($user->email_verified_at) {
             return;
+        }
+
+        $latestOtp = EmailOtp::where('user_id', $user->id)
+            ->where('is_used', false)
+            ->latest()
+            ->first();
+
+        if ($latestOtp && $latestOtp->created_at->gt(now()->subSeconds(self::OTP_RESEND_COOLDOWN_SECONDS))) {
+            throw ValidationException::withMessages([
+                'email' => ['Please wait before requesting another verification code.'],
+            ]);
         }
 
         $this->sendEmailVerificationOtp($user);

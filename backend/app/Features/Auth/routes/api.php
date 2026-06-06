@@ -3,14 +3,12 @@
 use App\Features\Auth\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('throttle:10,1')->group(function () {
-    Route::post('auth/register', [AuthController::class, 'register']);
-    Route::post('auth/login', [AuthController::class, 'login']);
-    Route::post('auth/verify-email', [AuthController::class, 'verifyEmail']);
-    Route::post('auth/email-verification/resend', [AuthController::class, 'resendEmailVerification']);
-    Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('auth/reset-password', [AuthController::class, 'resetPassword']);
-});
+Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:auth-register');
+Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:auth-login');
+Route::post('auth/verify-email', [AuthController::class, 'verifyEmail'])->middleware('throttle:auth-verify-email');
+Route::post('auth/email-verification/resend', [AuthController::class, 'resendEmailVerification'])->middleware('throttle:auth-resend-email');
+Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:auth-password');
+Route::post('auth/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:auth-password');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/me', [AuthController::class, 'me']);

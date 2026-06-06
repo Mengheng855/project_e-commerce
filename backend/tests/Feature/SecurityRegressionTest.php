@@ -103,6 +103,40 @@ class SecurityRegressionTest extends TestCase
             'email' => $user->email,
             'otp' => '123456',
             'device_name' => 'web',
-        ])->assertUnprocessable();
+        ])->assertTooManyRequests();
+    }
+
+    public function test_email_verification_resend_has_cooldown(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
+
+        EmailOtp::create([
+            'user_id' => $user->id,
+            'otp' => Hash::make('123456'),
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
+        $this->postJson('/api/v1/auth/email-verification/resend', [
+            'email' => $user->email,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('email');
+    }
+
+    public function test_login_is_throttled_after_five_attempts_per_minute(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/v1/auth/login', [
+                'login' => 'missing@example.test',
+                'password' => 'password',
+            ])->assertUnprocessable();
+        }
+
+        $this->postJson('/api/v1/auth/login', [
+            'login' => 'missing@example.test',
+            'password' => 'password',
+        ])->assertTooManyRequests();
     }
 }
