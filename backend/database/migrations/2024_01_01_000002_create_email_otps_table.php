@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('email_otps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('otp', 6);
+            $table->string('otp');
+            $table->unsignedTinyInteger('attempts')->default(0);
+            $table->timestamp('locked_until')->nullable();
             $table->boolean('is_used')->default(false);
             $table->timestamp('expires_at');
             $table->timestamps();

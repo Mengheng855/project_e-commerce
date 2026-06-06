@@ -20,12 +20,12 @@
                         <td style="padding:32px;">
                             <h1 style="margin:0;font-size:24px;line-height:1.3;color:#0f172a;">Verify your email address</h1>
                             <p style="margin:16px 0 0;font-size:15px;line-height:1.7;color:#475569;">
-                                Request all 6 digits, then enter them in order in TosTinh to finish creating your account.
+                                Enter this code in TosTinh to finish creating your account.
                             </p>
 
                             <div style="margin:28px 0;padding:22px;border:1px solid #99d8cf;border-radius:10px;background:#ecfdf9;text-align:center;">
-                                <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#0f766e;">Digit {{ $position }} of {{ $total }}</div>
-                                <div style="margin-top:10px;font-size:38px;line-height:1;font-weight:900;letter-spacing:0.18em;color:#0f172a;">{{ $digit }}</div>
+                                <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#0f766e;">Verification code</div>
+                                <div style="margin-top:10px;font-size:38px;line-height:1;font-weight:900;letter-spacing:0.18em;color:#0f172a;">{{ $otp }}</div>
                             </div>
 
                             <p style="margin:0;font-size:14px;line-height:1.7;color:#475569;">

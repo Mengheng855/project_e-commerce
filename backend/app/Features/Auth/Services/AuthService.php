@@ -12,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
+    private const OTP_MAX_ATTEMPTS = 5;
+
     public function register(array $data): User
     {
         $user = User::create([
@@ -69,19 +71,31 @@ class AuthService
         }
 
         $otp = EmailOtp::where('user_id', $user->id)
-            ->where('otp', $data['otp'])
             ->where('is_used', false)
             ->where('expires_at', '>', now())
             ->latest()
             ->first();
 
-        if ($otp && $otp->sent_digits_count < 6) {
+        if (! $otp) {
             throw ValidationException::withMessages([
-                'otp' => ['Request all 6 verification digits before verifying.'],
+                'otp' => ['The verification code is invalid or expired.'],
             ]);
         }
 
-        if (! $otp) {
+        if ($otp->locked_until && $otp->locked_until->isFuture()) {
+            throw ValidationException::withMessages([
+                'otp' => ['The verification code is invalid or expired.'],
+            ]);
+        }
+
+        if (! Hash::check($data['otp'], $otp->otp)) {
+            $attempts = $otp->attempts + 1;
+
+            $otp->forceFill([
+                'attempts' => $attempts,
+                'locked_until' => $attempts >= self::OTP_MAX_ATTEMPTS ? now()->addMinutes(10) : null,
+            ])->save();
+
             throw ValidationException::withMessages([
                 'otp' => ['The verification code is invalid or expired.'],
             ]);
@@ -131,42 +145,26 @@ class AuthService
 
     private function sendEmailVerificationOtp(User $user): void
     {
-        $otp = EmailOtp::where('user_id', $user->id)
+        $otp = $this->generateEmailVerificationOtp();
+
+        EmailOtp::where('user_id', $user->id)
             ->where('is_used', false)
-            ->where('expires_at', '>', now())
-            ->latest()
-            ->first();
+            ->update(['is_used' => true]);
 
-        if (! $otp) {
-            EmailOtp::where('user_id', $user->id)
-                ->where('is_used', false)
-                ->update(['is_used' => true]);
-
-            $otp = EmailOtp::create([
-                'user_id' => $user->id,
-                'otp' => $this->generateEmailVerificationOtp(),
-                'sent_digits_count' => 0,
-                'expires_at' => now()->addMinutes(10),
-            ]);
-        }
-
-        $position = min($otp->sent_digits_count + 1, 6);
-        $digit = substr($otp->otp, $position - 1, 1);
-
-        if ($otp->sent_digits_count < 6) {
-            $otp->update(['sent_digits_count' => $position]);
-        }
+        EmailOtp::create([
+            'user_id' => $user->id,
+            'otp' => Hash::make($otp),
+            'attempts' => 0,
+            'locked_until' => null,
+            'expires_at' => now()->addMinutes(10),
+        ]);
 
         Mail::send(
             ['html' => 'emails.verify-email-otp', 'text' => 'emails.verify-email-otp-text'],
-            [
-                'digit' => $digit,
-                'position' => $position,
-                'total' => 6,
-            ],
+            ['otp' => $otp],
             function ($message) use ($user) {
                 $message->to($user->email)
-                    ->subject('Verify your TosTinh email digit');
+                    ->subject('Verify your TosTinh email');
             }
         );
     }

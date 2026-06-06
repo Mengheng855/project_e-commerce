@@ -10,7 +10,8 @@ class EmailOtp extends Model
     protected $fillable = [
         'user_id',
         'otp',
-        'sent_digits_count',
+        'attempts',
+        'locked_until',
         'is_used',
         'expires_at',
     ];
@@ -19,7 +20,8 @@ class EmailOtp extends Model
     {
         return [
             'is_used' => 'boolean',
-            'sent_digits_count' => 'integer',
+            'attempts' => 'integer',
+            'locked_until' => 'datetime',
             'expires_at' => 'datetime',
         ];
     }

@@ -29,7 +29,7 @@ class AuthController extends Controller
         $user = $this->auth->register($request->validated());
 
         return response()->json([
-            'message' => 'Account created. Verification digit 1 of 6 sent to email.',
+            'message' => 'Account created. Verification code sent to email.',
             'data' => [
                 'email' => $user->email,
                 'requires_email_verification' => true,
@@ -46,7 +46,7 @@ class AuthController extends Controller
     {
         $this->auth->resendEmailVerification($request->validated('email'));
 
-        return response()->json(['message' => 'Next verification digit sent to email.']);
+        return response()->json(['message' => 'Verification code sent to email.']);
     }
 
     public function login(LoginRequest $request)

@@ -75,7 +75,7 @@ export function VerifyEmailForm() {
       <div>
         <p className="text-sm font-black uppercase tracking-wide text-teal-800">Check your email</p>
         <h1 className="mt-2 text-3xl font-black text-teal-950">Verify email</h1>
-        <p className="mt-3 text-sm font-medium leading-6 text-teal-900/75">Request all 6 digits, then enter them in order.</p>
+        <p className="mt-3 text-sm font-medium leading-6 text-teal-900/75">Enter the 6-digit code we sent to your inbox.</p>
       </div>
 
       {error ? <div className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">{error}</div> : null}
@@ -100,7 +100,7 @@ export function VerifyEmailForm() {
       </Button>
 
       <button className="mt-3 w-full rounded-md border border-teal-800 px-4 py-2 text-sm font-bold text-teal-900 hover:bg-teal-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-60" disabled={isResending} onClick={handleResend} type="button">
-        {isResending ? 'Sending...' : 'Send next digit'}
+        {isResending ? 'Sending...' : 'Resend code'}
       </button>
 
       <p className="mt-5 text-center text-sm font-semibold text-teal-900/75">
