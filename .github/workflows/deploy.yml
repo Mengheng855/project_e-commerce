@@ -15,14 +15,13 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: root
-          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /var/www/myapp/project_e-commerce
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
-            docker compose down
-            docker compose up -d --build
             docker compose run --rm backend composer install
-            docker compose exec backend php artisan optimize:clear
+            docker compose up -d --build
             docker compose exec backend php artisan migrate --force
+            docker compose restart backend
