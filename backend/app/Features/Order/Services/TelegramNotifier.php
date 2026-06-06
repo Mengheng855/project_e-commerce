@@ -6,7 +6,7 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-
+ 
 class TelegramNotifier
 {
     public function orderCreated(Order $order): void
