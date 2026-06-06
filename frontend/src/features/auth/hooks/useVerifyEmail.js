@@ -41,7 +41,7 @@ export function useVerifyEmail() {
 
     try {
       const response = await resendEmailVerification({ email })
-      setMessage(response?.message ?? 'Verification code sent to email.')
+      setMessage(response?.message ?? 'Next verification digit sent to email.')
     } catch (error) {
       setError(getErrorMessage(error))
       setFieldErrors(error?.errors ?? {})

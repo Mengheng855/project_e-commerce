@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\EmailOtp;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -57,5 +58,46 @@ class SecurityRegressionTest extends TestCase
         ]);
 
         $response->assertUnauthorized();
+    }
+
+    public function test_email_verification_requires_six_digit_sends_before_verifying(): void
+    {
+        Mail::fake();
+
+        $this->postJson('/api/v1/auth/register', [
+            'username' => 'otp_user',
+            'email' => 'otp-user@example.test',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertCreated();
+
+        $user = User::where('email', 'otp-user@example.test')->firstOrFail();
+        $otp = EmailOtp::where('user_id', $user->id)->firstOrFail();
+
+        $this->assertSame(1, $otp->sent_digits_count);
+
+        $this->postJson('/api/v1/auth/verify-email', [
+            'email' => $user->email,
+            'otp' => $otp->otp,
+            'device_name' => 'web',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('otp');
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/v1/auth/email-verification/resend', [
+                'email' => $user->email,
+            ])->assertOk();
+        }
+
+        $this->assertSame(6, $otp->refresh()->sent_digits_count);
+
+        $this->postJson('/api/v1/auth/verify-email', [
+            'email' => $user->email,
+            'otp' => $otp->otp,
+            'device_name' => 'web',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.user.email', $user->email);
     }
 }

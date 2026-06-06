@@ -10,6 +10,7 @@ class EmailOtp extends Model
     protected $fillable = [
         'user_id',
         'otp',
+        'sent_digits_count',
         'is_used',
         'expires_at',
     ];
@@ -18,6 +19,7 @@ class EmailOtp extends Model
     {
         return [
             'is_used' => 'boolean',
+            'sent_digits_count' => 'integer',
             'expires_at' => 'datetime',
         ];
     }

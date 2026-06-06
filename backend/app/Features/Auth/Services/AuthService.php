@@ -75,6 +75,12 @@ class AuthService
             ->latest()
             ->first();
 
+        if ($otp && $otp->sent_digits_count < 6) {
+            throw ValidationException::withMessages([
+                'otp' => ['Request all 6 verification digits before verifying.'],
+            ]);
+        }
+
         if (! $otp) {
             throw ValidationException::withMessages([
                 'otp' => ['The verification code is invalid or expired.'],
@@ -125,26 +131,55 @@ class AuthService
 
     private function sendEmailVerificationOtp(User $user): void
     {
-        $otp = (string) random_int(100000, 999999);
-
-        EmailOtp::where('user_id', $user->id)
+        $otp = EmailOtp::where('user_id', $user->id)
             ->where('is_used', false)
-            ->update(['is_used' => true]);
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
 
-        EmailOtp::create([
-            'user_id' => $user->id,
-            'otp' => $otp,
-            'expires_at' => now()->addMinutes(10),
-        ]);
+        if (! $otp) {
+            EmailOtp::where('user_id', $user->id)
+                ->where('is_used', false)
+                ->update(['is_used' => true]);
+
+            $otp = EmailOtp::create([
+                'user_id' => $user->id,
+                'otp' => $this->generateEmailVerificationOtp(),
+                'sent_digits_count' => 0,
+                'expires_at' => now()->addMinutes(10),
+            ]);
+        }
+
+        $position = min($otp->sent_digits_count + 1, 6);
+        $digit = substr($otp->otp, $position - 1, 1);
+
+        if ($otp->sent_digits_count < 6) {
+            $otp->update(['sent_digits_count' => $position]);
+        }
 
         Mail::send(
             ['html' => 'emails.verify-email-otp', 'text' => 'emails.verify-email-otp-text'],
-            ['otp' => $otp],
+            [
+                'digit' => $digit,
+                'position' => $position,
+                'total' => 6,
+            ],
             function ($message) use ($user) {
                 $message->to($user->email)
-                    ->subject('Verify your TosTinh email');
+                    ->subject('Verify your TosTinh email digit');
             }
         );
+    }
+
+    private function generateEmailVerificationOtp(): string
+    {
+        $otp = '';
+
+        for ($i = 0; $i < 6; $i++) {
+            $otp .= (string) random_int(0, 9);
+        }
+
+        return $otp;
     }
 
     private function tokenResponse(User $user, ?string $deviceName, ?Request $request = null, array $data = []): array
