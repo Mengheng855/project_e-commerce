@@ -9,7 +9,12 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install curl pdo pdo_mysql zip
 
-RUN printf "%s\n" "upload_max_filesize=10M" "post_max_size=12M" "memory_limit=256M" > /usr/local/etc/php/conf.d/uploads.ini
+RUN printf "%s\n" \
+    "upload_max_filesize=10M" \
+    "post_max_size=12M" \
+    "memory_limit=256M" \
+    "expose_php=Off" \
+    > /usr/local/etc/php/conf.d/app.ini
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
