@@ -55,7 +55,7 @@ export function AdminLayout({ children }) {
 
   async function handleAdminLogout() {
     await logout()
-    window.location.href = '/admin/login'
+    window.location.href = '/login'
   }
 
   function handleResizeStart(event) {

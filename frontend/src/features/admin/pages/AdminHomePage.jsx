@@ -144,7 +144,7 @@ export function AdminHomePage() {
 
       {dashboard.errors.users ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-          Users API needs an admin account. Login at /admin/login with an admin user to see users.
+          Users API needs an admin account. Login at /login with an admin user to see users.
         </div>
       ) : null}
 

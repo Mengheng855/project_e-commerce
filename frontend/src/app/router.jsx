@@ -61,10 +61,6 @@ function RouteLoading() {
   const { pathname } = useLocation()
 
   if (pathname.startsWith('/admin')) {
-    if (pathname === '/admin/login') {
-      return <AuthPageSkeleton />
-    }
-
     return <AdminPageSkeleton />
   }
 
@@ -295,7 +291,7 @@ function AdminRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate replace to="/admin/login" />
+    return <Navigate replace to="/login" />
   }
 
   if (!user?.is_admin || !storage.isAdminSession()) {
@@ -377,16 +373,7 @@ export function AppRouter() {
               </GuestRoute>
             }
           />
-          <Route
-            path="/admin/login"
-            element={
-              <AdminGuestRoute>
-                <AuthLayout>
-                  <AdminLoginPage />
-                </AuthLayout>
-              </AdminGuestRoute>
-            }
-          />
+
           <Route
             path="/verify-email"
             element={

@@ -22,8 +22,13 @@ export function useLogin() {
       const authData = await login(values)
 
       storage.setToken(authData.token)
-      storage.setAdminSession(false)
-      navigate('/', { replace: true })
+      if (authData.user?.is_admin) {
+        storage.setAdminSession(true)
+        navigate('/admin', { replace: true })
+      } else {
+        storage.setAdminSession(false)
+        navigate('/', { replace: true })
+      }
     } catch (error) {
       const verificationEmail = error?.errors?.email?.[0]
       if (verificationEmail) {
