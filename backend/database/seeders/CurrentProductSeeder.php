@@ -254,7 +254,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 799,
                 'original_price' => 1000,
                 'stock' => 200,
-                'image' => 'Mq36MzPgW7wYsi1Py48s2moNCA76Vz4YC5PoPvYW.jpg',
+                'image' => 'asus_laptop.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'computer',
@@ -262,9 +262,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-05-14 08:18:23',
                 'updated_at' => '2026-05-14 08:18:41',
                 'images' => [
-                    'Mq36MzPgW7wYsi1Py48s2moNCA76Vz4YC5PoPvYW.jpg',
-                    'MIvI27h7fs6pVlDQ91gpiANrrLylgZ8i1mPmKmUT.jpg',
-                    'JU49vcqiTiwnV6ueTgZNmOEjxgC15scRa9TEeh73.jpg',
+                    'asus_laptop.png',
                 ],
                 'variants' => [
                     ['type' => 'Storage', 'value' => '512GB', 'price_modifier' => 50, 'stock' => 0, 'is_active' => true],
@@ -290,7 +288,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 200,
                 'original_price' => 300,
                 'stock' => 89,
-                'image' => 'rGnxS1aluhwI4ExJBcHg0FTdvG1B4mfonJiFBLNp.jpg',
+                'image' => 'iphone_xs_max.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'phone',
@@ -298,9 +296,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-05-14 08:27:42',
                 'updated_at' => '2026-05-14 08:27:42',
                 'images' => [
-                    'rGnxS1aluhwI4ExJBcHg0FTdvG1B4mfonJiFBLNp.jpg',
-                    'HcTp1Rt7bVWHsRfmmxM1tzHvzzeGE1hUZeFmPfZX.jpg',
-                    'jtgqHy91jBej6mypMBDmnScY0v9Cr1sMhgPOb46h.jpg',
+                    'iphone_xs_max.png',
                 ],
                 'variants' => [
                     ['type' => 'Storage', 'value' => '64GB', 'price_modifier' => 20, 'stock' => 89, 'is_active' => true],
@@ -362,7 +358,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 349,
                 'original_price' => 399,
                 'stock' => 50,
-                'image' => 'KbXsu2zp2I9ujqTx2N5Ktz1FunXQL1p1DQzkMhZ5.jpg',
+                'image' => 'sony_headphones.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'audio',
@@ -370,7 +366,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-06-21 14:52:00',
                 'updated_at' => '2026-06-21 14:52:00',
                 'images' => [
-                    'KbXsu2zp2I9ujqTx2N5Ktz1FunXQL1p1DQzkMhZ5.jpg',
+                    'sony_headphones.png',
                 ],
                 'variants' => [
                     ['type' => 'Color', 'value' => 'Black', 'color_hex' => '#111111', 'price_modifier' => 0, 'stock' => 25, 'is_active' => true],
@@ -389,7 +385,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 129,
                 'original_price' => 149,
                 'stock' => 100,
-                'image' => 'bIrO2WtlMXVJbmQfDIv9ru8YdDrjQM4Tsv3j91fA.jpg',
+                'image' => 'xiaomi_smartwatch.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'smartwatch',
@@ -397,7 +393,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-06-21 14:52:00',
                 'updated_at' => '2026-06-21 14:52:00',
                 'images' => [
-                    'bIrO2WtlMXVJbmQfDIv9ru8YdDrjQM4Tsv3j91fA.jpg',
+                    'xiaomi_smartwatch.png',
                 ],
                 'variants' => [
                     ['type' => 'Color', 'value' => 'Black', 'color_hex' => '#111111', 'price_modifier' => 0, 'stock' => 50, 'is_active' => true],
@@ -416,7 +412,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 599,
                 'original_price' => 699,
                 'stock' => 40,
-                'image' => 'Mq36MzPgW7wYsi1Py48s2moNCA76Vz4YC5PoPvYW.jpg',
+                'image' => 'ipad_air.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'tablet',
@@ -424,7 +420,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-06-21 14:52:00',
                 'updated_at' => '2026-06-21 14:52:00',
                 'images' => [
-                    'Mq36MzPgW7wYsi1Py48s2moNCA76Vz4YC5PoPvYW.jpg',
+                    'ipad_air.png',
                 ],
                 'variants' => [
                     ['type' => 'Storage', 'value' => '128GB', 'price_modifier' => 0, 'stock' => 20, 'is_active' => true],
@@ -444,7 +440,7 @@ class CurrentProductSeeder extends Seeder
                 'price' => 249,
                 'original_price' => 299,
                 'stock' => 60,
-                'image' => 'gpcgAr1nkjCFJcCI3MvKwWot7wXjN0q7Mf8r6wz1.jpg',
+                'image' => 'galaxy_watch.png',
                 'is_active' => true,
                 'is_featured' => true,
                 'category' => 'smartwatch',
@@ -452,7 +448,7 @@ class CurrentProductSeeder extends Seeder
                 'created_at' => '2026-06-21 14:52:00',
                 'updated_at' => '2026-06-21 14:52:00',
                 'images' => [
-                    'gpcgAr1nkjCFJcCI3MvKwWot7wXjN0q7Mf8r6wz1.jpg',
+                    'galaxy_watch.png',
                 ],
                 'variants' => [
                     ['type' => 'Color', 'value' => 'Graphite', 'color_hex' => '#2b2b2a', 'price_modifier' => 0, 'stock' => 30, 'is_active' => true],
