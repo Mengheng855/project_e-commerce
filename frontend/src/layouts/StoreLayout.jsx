@@ -121,8 +121,8 @@ export function StoreLayout({ children }) {
       return () => { active = false }
     }
 
-    getCart().then((cart) => {
-      if (active) setCartCount(cart?.items_count ?? 0)
+    getCart().then(() => {
+      if (active) setCartCount(readStoredCartCount())
     }).catch(() => {
       if (active) setCartCount(readStoredCartCount())
     })

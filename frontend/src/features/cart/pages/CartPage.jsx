@@ -4,6 +4,7 @@ import { checkoutCart, clearCart, deleteCartItem, getCart, updateCartItem } from
 import { assetUrl } from '../../../shared/utils/assetUrl'
 import { formatCurrency } from '../../../shared/utils/formatCurrency'
 import { useAuth } from '../../../shared/hooks/useAuth'
+import { publishCartCount } from '../utils/cartCount'
 
 function itemImage(item) {
   return item.product?.image ? assetUrl(item.product.image) : null
@@ -100,6 +101,7 @@ export function CartPage() {
     try {
       const order = await checkoutCart({ payment_method: paymentMethod, currency: 'USD' })
       setCart({ items: [], items_count: 0, total: '0.00' })
+      publishCartCount(0)
       if (paymentMethod === 'bakong') {
         navigate(`/payments/bakong/${order.id}`)
         return

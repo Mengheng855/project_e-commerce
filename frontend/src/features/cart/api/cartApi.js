@@ -3,9 +3,10 @@ import { endpoints } from '../../../shared/api/endpoints'
 import { publishCartCount } from '../utils/cartCount'
 
 export async function getCart() {
+  const requestedAt = Date.now()
   const response = await apiClient(endpoints.cart)
 
-  publishCartCount(response.data)
+  publishCartCount(response.data, { version: requestedAt })
 
   return response.data
 }
@@ -53,6 +54,8 @@ export async function checkoutCart(payload = {}) {
     method: 'POST',
     body: JSON.stringify(payload),
   })
+
+  publishCartCount(0)
 
   return response.data
 }
