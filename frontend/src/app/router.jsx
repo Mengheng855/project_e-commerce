@@ -373,6 +373,16 @@ export function AppRouter() {
               </GuestRoute>
             }
           />
+          <Route
+            path="/admin/login"
+            element={
+              <AdminGuestRoute>
+                <AuthLayout>
+                  <AdminLoginPage />
+                </AuthLayout>
+              </AdminGuestRoute>
+            }
+          />
 
           <Route
             path="/verify-email"
