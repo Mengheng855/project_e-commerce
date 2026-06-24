@@ -13,7 +13,7 @@ function itemImage(item) {
 export function CartPage() {
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
-  const isBakongDisabled = true
+  const isBakongDisabled = false
   const [cart, setCart] = useState(null)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
